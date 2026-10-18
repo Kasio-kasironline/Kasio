@@ -5,7 +5,7 @@ import LoginForm from '../features/auth/LoginForm'
  * Features an elevated frosted glass container, delicate borders,
  * brand branding for UMKM, and responsive layout for mobile and desktop.
  */
-export default function LoginPage({onLoginSuccess}) {
+export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
   return (
     <main className="min-h-screen w-full bg-[#F5F5F7] flex flex-col justify-between items-center p-4 sm:p-6 relative overflow-hidden">
       {/* Ambient background decoration (Apple style subtle glow) */}
@@ -60,21 +60,18 @@ export default function LoginPage({onLoginSuccess}) {
             </p>
           </div>
 
-          <LoginForm onLoginSuccess={onLoginSuccess}/>
+          <LoginForm onLoginSuccess={onLoginSuccess} />
 
           <div className="mt-6 pt-5 border-t border-black/[0.06] text-center">
             <p className="text-[13px] text-[#86868B]">
               Belum punya akun usaha?{' '}
-              <a
-                href="#register"
-                onClick={(e) => {
-                  e.preventDefault()
-                  alert('Halaman pendaftaran usaha baru akan aktif pada tahap berikutnya.')
-                }}
-                className="text-[#0071E3] font-medium hover:underline"
+              <button
+                type="button"
+                onClick={onNavigateToRegister}
+                className="text-[#0071E3] font-medium hover:underline cursor-pointer"
               >
                 Daftar sekarang
-              </a>
+              </button>
             </p>
           </div>
         </div>
