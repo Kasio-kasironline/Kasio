@@ -85,7 +85,7 @@ export default function PosPage({
   return (
     <div className="min-h-screen bg-[#F5F5F7] text-[#1D1D1F] flex flex-col font-sans">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/[0.06] px-4 sm:px-6 py-3">
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/6 px-4 sm:px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Brand & Store Profile */}
           <div className="flex items-center gap-3 shrink-0">
@@ -120,7 +120,7 @@ export default function PosPage({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari menu, kopi, atau snack..."
-              className="w-full pl-10 pr-9 py-2 bg-black/[0.04] hover:bg-black/[0.06] focus:bg-white rounded-xl border border-transparent focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/15 text-[14px] text-[#1D1D1F] placeholder-[#86868B] transition-all outline-none"
+              className="w-full pl-10 pr-9 py-2 bg-black/4 hover:bg-black/6 focus:bg-white rounded-xl border border-transparent focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/15 text-[14px] text-[#1D1D1F] placeholder-[#86868B] transition-all outline-none"
             />
             {searchQuery && (
               <button
@@ -139,7 +139,7 @@ export default function PosPage({
               <button
                 type="button"
                 onClick={onNavigateToMenuManagement}
-                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/[0.05] hover:bg-black/[0.08] active:scale-95 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/8 active:scale-95 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
               >
                 <svg className="w-4 h-4 text-[#86868B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
@@ -168,7 +168,7 @@ export default function PosPage({
                   className={`px-4 py-2 rounded-full text-[13px] font-semibold transition-all shrink-0 cursor-pointer ${
                     isActive
                       ? 'bg-[#1D1D1F] text-white shadow-sm'
-                      : 'bg-white hover:bg-black/[0.04] text-[#86868B] hover:text-[#1D1D1F] border border-black/[0.06]'
+                      : 'bg-white hover:bg-black/4 text-[#86868B] hover:text-[#1D1D1F] border border-black/6'
                   }`}
                 >
                   {category}
@@ -191,7 +191,7 @@ export default function PosPage({
 
           {/* Menu Items Grid */}
           {filteredItems.length === 0 ? (
-            <div className="p-12 text-center bg-white rounded-3xl border border-black/[0.06] text-[#86868B]">
+            <div className="p-12 text-center bg-white rounded-3xl border border-black/6 text-[#86868B]">
               <span className="text-3xl">🔍</span>
               <p className="font-semibold text-[#1D1D1F] text-[15px] mt-2">
                 Menu tidak ditemukan
@@ -221,7 +221,7 @@ export default function PosPage({
         </section>
 
         {/* Right Section (Desktop/Tablet): Sticky Cart Panel */}
-        <aside className="hidden md:block w-96 shrink-0 sticky top-[72px] h-[calc(100vh-96px)]">
+        <aside className="hidden md:block w-96 shrink-0 sticky top-18 h-[calc(100vh-96px)]">
           <CartPanel
             cart={cart}
             onUpdateQuantity={handleUpdateQuantity}
@@ -267,7 +267,7 @@ export default function PosPage({
           className="md:hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex flex-col justify-end"
         >
           <div className="bg-white rounded-t-3xl max-h-[85vh] h-full flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
-            <div className="p-3 flex justify-center border-b border-black/[0.04]">
+            <div className="p-3 flex justify-center border-b border-black/4">
               <button
                 type="button"
                 onClick={() => setIsMobileCartOpen(false)}

@@ -48,7 +48,7 @@ export default function MenuManagementPage({
   return (
     <div className="min-h-screen bg-[#F5F5F7] text-[#1D1D1F] flex flex-col font-sans">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/[0.06] px-4 sm:px-6 py-3">
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/6 px-4 sm:px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Back to POS Button */}
           <div className="flex items-center gap-3">
@@ -93,7 +93,7 @@ export default function MenuManagementPage({
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
         {/* Action Header Banner */}
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-black/6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[#1D1D1F] tracking-tight">
               Daftar Menu Toko
@@ -133,7 +133,7 @@ export default function MenuManagementPage({
                   className={`px-4 py-2 rounded-full text-[13px] font-semibold transition-all shrink-0 cursor-pointer ${
                     isActive
                       ? 'bg-[#1D1D1F] text-white shadow-sm'
-                      : 'bg-white hover:bg-black/[0.04] text-[#86868B] hover:text-[#1D1D1F] border border-black/[0.06]'
+                      : 'bg-white hover:bg-black/4 text-[#86868B] hover:text-[#1D1D1F] border border-black/6'
                   }`}
                 >
                   {category}
@@ -159,7 +159,7 @@ export default function MenuManagementPage({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari nama menu..."
-              className="w-full pl-10 pr-9 py-2 bg-white rounded-xl border border-black/[0.1] focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/15 text-[14px] text-[#1D1D1F] placeholder-[#86868B] transition-all outline-none"
+              className="w-full pl-10 pr-9 py-2 bg-white rounded-xl border border-black/10 focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/15 text-[14px] text-[#1D1D1F] placeholder-[#86868B] transition-all outline-none"
             />
             {searchQuery && (
               <button
@@ -175,7 +175,7 @@ export default function MenuManagementPage({
 
         {/* Menu Items Table / Card Grid */}
         {filteredItems.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-3xl border border-black/[0.06] text-[#86868B]">
+          <div className="p-12 text-center bg-white rounded-3xl border border-black/6 text-[#86868B]">
             <span className="text-3xl">🍽️</span>
             <p className="font-semibold text-[#1D1D1F] text-[15px] mt-2">
               Tidak ada menu yang sesuai
@@ -191,12 +191,12 @@ export default function MenuManagementPage({
             {filteredItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl border border-black/[0.06] p-4 flex flex-col justify-between hover:shadow-md transition-all text-left"
+                className="bg-white rounded-2xl border border-black/6 p-4 flex flex-col justify-between hover:shadow-md transition-all text-left"
               >
                 <div>
                   {/* Category and Stock Badge */}
                   <div className="flex items-center justify-between mb-2.5">
-                    <span className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-black/[0.04] text-[#86868B]">
+                    <span className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-black/4 text-[#86868B]">
                       {item.category}
                     </span>
 
@@ -216,7 +216,7 @@ export default function MenuManagementPage({
 
                   {/* Thumbnail, Name, and Description */}
                   <div className="flex items-start gap-3">
-                    <div className="w-13 h-13 rounded-xl bg-[#F5F5F7] border border-black/[0.04] flex items-center justify-center text-2xl shrink-0 select-none">
+                    <div className="w-13 h-13 rounded-xl bg-[#F5F5F7] border border-black/4 flex items-center justify-center text-2xl shrink-0 select-none">
                       {item.image || '🍽️'}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -231,7 +231,7 @@ export default function MenuManagementPage({
                 </div>
 
                 {/* Bottom Footer: Price and Delete Action */}
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-black/[0.04]">
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-black/4">
                   <div>
                     <span className="text-[10px] text-[#86868B] uppercase font-medium">Harga</span>
                     <p className="text-[16px] font-bold text-[#1D1D1F] leading-tight">
@@ -273,7 +273,7 @@ export default function MenuManagementPage({
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-150"
         >
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full border border-black/[0.08] shadow-2xl text-center space-y-4">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full border border-black/8 shadow-2xl text-center space-y-4">
             <div className="w-12 h-12 rounded-full bg-[#FF3B30]/10 text-[#FF3B30] mx-auto flex items-center justify-center text-xl">
               ⚠️
             </div>
@@ -296,7 +296,7 @@ export default function MenuManagementPage({
                 variant="destructive"
                 size="md"
                 onClick={confirmDelete}
-                className="flex-1 bg-[#FF3B30] text-white hover:bg-[#D70015]"
+                className="flex-1 bg-[#FF3B30] text-white hover:bg-[#e00f24]"
               >
                 Hapus
               </Button>
