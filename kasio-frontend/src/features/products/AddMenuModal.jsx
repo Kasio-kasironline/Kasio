@@ -89,9 +89,9 @@ export default function AddMenuModal({
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-2xl rounded-3xl border border-black/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden p-6 sm:p-7 text-left">
+      <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-2xl rounded-3xl border border-black/8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden p-6 sm:p-7 text-left">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
+        <div className="flex items-center justify-between pb-4 border-b border-black/6">
           <div>
             <h3 className="text-xl font-bold text-[#1D1D1F] tracking-tight">
               Tambah Menu Baru
@@ -104,7 +104,7 @@ export default function AddMenuModal({
             type="button"
             onClick={onClose}
             aria-label="Tutup modal"
-            className="w-8 h-8 rounded-full bg-black/[0.05] hover:bg-black/[0.1] text-[#1D1D1F] flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 text-[#1D1D1F] flex items-center justify-center transition-colors cursor-pointer"
           >
             ✕
           </button>
@@ -140,7 +140,7 @@ export default function AddMenuModal({
                   setCategory(e.target.value)
                   if (errors.category) setErrors((prev) => ({ ...prev, category: '' }))
                 }}
-                className="w-full py-2.5 px-3.5 text-[15px] text-[#1D1D1F] bg-white rounded-xl border border-black/[0.12] hover:border-black/[0.24] focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/15 transition-all"
+                className="w-full py-2.5 px-3.5 text-[15px] text-[#1D1D1F] bg-white rounded-xl border border-black/12 hover:border-black/24 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/15 transition-all"
               >
                 {categories
                   .filter((cat) => cat !== 'Semua')
@@ -158,7 +158,7 @@ export default function AddMenuModal({
                   value={customCategory}
                   onChange={(e) => setCustomCategory(e.target.value)}
                   placeholder="Ketik kategori baru..."
-                  className="mt-1 w-full py-2 px-3 text-[14px] bg-white rounded-xl border border-black/[0.12] focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 outline-none"
+                  className="mt-1 w-full py-2 px-3 text-[14px] bg-white rounded-xl border border-black/12 focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 outline-none"
                 />
               )}
               {errors.category && (
@@ -194,7 +194,7 @@ export default function AddMenuModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Jelaskan bahan, rasa, atau keistimewaan menu ini..."
-              className="w-full py-2 px-3.5 text-[14px] text-[#1D1D1F] placeholder-[#86868B] bg-white rounded-xl border border-black/[0.12] hover:border-black/[0.24] focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/15 transition-all resize-none"
+              className="w-full py-2 px-3.5 text-[14px] text-[#1D1D1F] placeholder-[#86868B] bg-white rounded-xl border border-black/12 hover:border-black/24 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/15 transition-all resize-none"
             />
           </div>
 
@@ -203,7 +203,7 @@ export default function AddMenuModal({
             <label className="text-[13px] font-medium text-[#1D1D1F]">
               Pilih Ikon Menu
             </label>
-            <div className="flex flex-wrap gap-2 p-2.5 bg-[#F5F5F7] rounded-2xl border border-black/[0.04]">
+            <div className="flex flex-wrap gap-2 p-2.5 bg-[#F5F5F7] rounded-2xl border border-black/4">
               {EMOJI_OPTIONS.map((emoji) => (
                 <button
                   key={emoji}
@@ -222,7 +222,7 @@ export default function AddMenuModal({
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-3 flex items-center justify-end gap-2.5 border-t border-black/[0.06]">
+          <div className="pt-3 flex items-center justify-end gap-2.5 border-t border-black/6">
             <Button variant="secondary" size="md" onClick={onClose}>
               Batal
             </Button>
