@@ -15,6 +15,7 @@ export default function PosPage({
   menuItems = DUMMY_MENU_ITEMS,
   categories = CATEGORIES,
   onNavigateToMenuManagement,
+  onNavigateToAnalytics, 
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Semua')
@@ -135,6 +136,16 @@ export default function PosPage({
 
           {/* Top Actions: Menu Management Settings Button */}
           <div className="flex items-center gap-2 shrink-0">
+            {onNavigateToAnalytics && (
+              <button
+                type="button"
+                onClick={onNavigateToAnalytics}
+                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/8 active:scale-95 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
+              >
+                <span>📊</span>
+                <span>Analitik</span>
+              </button>
+            )}
             {onNavigateToMenuManagement && (
               <button
                 type="button"
