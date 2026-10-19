@@ -4,9 +4,10 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import PosPage from './pages/PosPage'
 import MenuManagementPage from './pages/MenuManagementPage'
+import AnalyticsPage from './pages/AnalyticsPage'
 
 export default function App() {
-  // Pilihan tampilan: 'pos' | 'menu' | 'login' | 'register'
+  // Pilihan tampilan: 'pos' | 'menu' | 'login' | 'register' | 'analytics'
   const [currentView, setCurrentView] = useState('pos')
 
   // Shared state untuk daftar menu dan kategori
@@ -70,12 +71,22 @@ export default function App() {
     )
   }
 
+  // Tampilan Analitik & Laporan Penjualan
+  if (currentView === 'analytics') {
+    return (
+      <AnalyticsPage
+        onNavigateToPos={() => setCurrentView('pos')}
+      />
+    )
+  }
+
   // Default: Tampilan Kasir POS
   return (
     <PosPage
       menuItems={menuItems}
       categories={categories}
       onNavigateToMenuManagement={() => setCurrentView('menu')}
+      onNavigateToAnalytics={() => setCurrentView('analytics')}
     />
   )
 }
