@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
+import { useAuth } from '../../hooks/useAuth'
 
 /**
  * RegisterForm component for UMKM store owner onboarding.
  * Captures owner name, business name, WhatsApp/phone, email, and password.
- * Follows Apple HIG design with client-side validation, demo autofill,
- * password toggle, and interactive registration simulation.
+ * Connects directly to Supabase Auth and registers business details.
+ * Follows Apple HIG design with client-side validation, error handling, and demo autofill.
  */
 export default function RegisterForm({ onRegisterSuccess }) {
+  const { register } = useAuth()
   const [formData, setFormData] = useState({
     ownerName: '',
     businessName: '',
@@ -22,6 +24,7 @@ export default function RegisterForm({ onRegisterSuccess }) {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const [registerSuccess, setRegisterSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
 
   // Quick fill helper for testing UI
   const handleFillDemo = () => {
@@ -41,8 +44,8 @@ export default function RegisterForm({ onRegisterSuccess }) {
   const handleChange = (e) => {
     const { id, value } = e.target
     setFormData((prev) => ({ ...prev, [id]: value }))
-    if (errors[id]) {
-      setErrors((prev) => ({ ...prev, [id]: '' }))
+    if (errors[id] || errors.general) {
+      setErrors((prev) => ({ ...prev, [id]: '', general: '' }))
     }
   }
 
@@ -87,26 +90,62 @@ export default function RegisterForm({ onRegisterSuccess }) {
     return Object.keys(nextErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
 
     setIsLoading(true)
     setRegisterSuccess(false)
+    setErrors({})
 
-    // Simulate API registration delay (UI only)
-    setTimeout(() => {
+    const res = await register({
+      email: formData.email,
+      password: formData.password,
+      ownerName: formData.ownerName,
+      businessName: formData.businessName,
+      phone: formData.phone,
+    })
+
+    if (!res.success) {
       setIsLoading(false)
-      setRegisterSuccess(true)
+      setErrors({ general: res.error })
+      return
+    }
+
+    setIsLoading(false)
+    setRegisterSuccess(true)
+
+    if (res.needsConfirmation) {
+      setSuccessMessage(
+        'Pendaftaran berhasil! Tautan konfirmasi telah dikirim ke email Anda. Silakan verifikasi untuk mulai menggunakan Kasio.'
+      )
+    } else {
+      setSuccessMessage(
+        `Toko ${formData.businessName} berhasil didaftarkan! Mengalihkan ke kasir...`
+      )
       if (onRegisterSuccess) {
         setTimeout(onRegisterSuccess, 800)
       }
-    }, 1000)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 text-left">
-      {/* Success Banner Simulation */}
+      {/* Error Alert Banner */}
+      {errors.general && (
+        <div
+          role="alert"
+          className="p-3.5 bg-[#FF3B30]/10 border border-[#FF3B30]/25 rounded-2xl flex items-start gap-2.5 transition-all"
+        >
+          <span className="text-[#FF3B30] text-base shrink-0 mt-0.5">⚠️</span>
+          <div className="text-[13px] text-[#1D1D1F]">
+            <p className="font-semibold text-[#FF3B30]">Gagal Mendaftar</p>
+            <p className="text-[#86868B] mt-0.5">{errors.general}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Success Banner */}
       {registerSuccess && (
         <div
           role="status"
@@ -120,15 +159,13 @@ export default function RegisterForm({ onRegisterSuccess }) {
           >
             <path
               fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
               clipRule="evenodd"
             />
           </svg>
           <div className="text-[13px] text-[#1D1D1F]">
             <p className="font-semibold text-[#34C759]">Registrasi Berhasil!</p>
-            <p className="text-[#86868B] mt-0.5">
-              Toko <strong>{formData.businessName}</strong> siap digunakan. Mengalihkan ke kasir...
-            </p>
+            <p className="text-[#86868B] mt-0.5">{successMessage}</p>
           </div>
         </div>
       )}

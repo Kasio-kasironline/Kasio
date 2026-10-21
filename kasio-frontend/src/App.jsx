@@ -5,8 +5,11 @@ import RegisterPage from './pages/RegisterPage'
 import PosPage from './pages/PosPage'
 import MenuManagementPage from './pages/MenuManagementPage'
 import AnalyticsPage from './pages/AnalyticsPage'
+import { AuthProvider } from './context/AuthProvider'
+import { useAuth } from './hooks/useAuth'
 
-export default function App() {
+function AppContent() {
+  const { user, business, isLoading, logout } = useAuth()
   // Pilihan tampilan: 'pos' | 'menu' | 'login' | 'register' | 'analytics'
   const [currentView, setCurrentView] = useState('pos')
 
@@ -36,8 +39,32 @@ export default function App() {
     )
   }
 
-  // Tampilan Login
-  if (currentView === 'login') {
+  // Apple-style clean loading splash screen
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F5F5F7] flex flex-col items-center justify-center p-4">
+        <div className="w-12 h-12 rounded-2xl bg-white shadow-md flex items-center justify-center text-2xl mb-4 border border-black/5 animate-pulse">
+          ☕
+        </div>
+        <div className="w-6 h-6 border-2 border-[#0071E3] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[13px] text-[#86868B] font-medium mt-3">
+          Memuat Kasio POS...
+        </p>
+      </div>
+    )
+  }
+
+  // Jika user belum login, batasi hanya ke LoginPage atau RegisterPage
+  if (!user) {
+    if (currentView === 'register') {
+      return (
+        <RegisterPage
+          onNavigateToLogin={() => setCurrentView('login')}
+          onRegisterSuccess={() => setCurrentView('pos')}
+        />
+      )
+    }
+
     return (
       <LoginPage
         onLoginSuccess={() => setCurrentView('pos')}
@@ -46,12 +73,16 @@ export default function App() {
     )
   }
 
-  // Tampilan Register
-  if (currentView === 'register') {
+  // Jika user sudah login tapi berada di tampilan login/register, arahkan ke POS
+  if (currentView === 'login' || currentView === 'register') {
     return (
-      <RegisterPage
-        onNavigateToLogin={() => setCurrentView('login')}
-        onRegisterSuccess={() => setCurrentView('pos')}
+      <PosPage
+        menuItems={menuItems}
+        categories={categories}
+        business={business}
+        onNavigateToMenuManagement={() => setCurrentView('menu')}
+        onNavigateToAnalytics={() => setCurrentView('analytics')}
+        onLogout={logout}
       />
     )
   }
@@ -66,7 +97,10 @@ export default function App() {
         onDeleteMenu={handleDeleteMenu}
         onToggleAvailability={handleToggleAvailability}
         onNavigateToPos={() => setCurrentView('pos')}
-        onNavigateToLogin={() => setCurrentView('login')}
+        onNavigateToLogin={() => {
+          logout()
+          setCurrentView('login')
+        }}
       />
     )
   }
@@ -85,8 +119,18 @@ export default function App() {
     <PosPage
       menuItems={menuItems}
       categories={categories}
+      business={business}
       onNavigateToMenuManagement={() => setCurrentView('menu')}
       onNavigateToAnalytics={() => setCurrentView('analytics')}
+      onLogout={logout}
     />
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }

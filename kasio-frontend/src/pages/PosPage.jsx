@@ -14,8 +14,10 @@ import { formatIDR } from '../utils/formatters'
 export default function PosPage({
   menuItems = DUMMY_MENU_ITEMS,
   categories = CATEGORIES,
+  business,
   onNavigateToMenuManagement,
-  onNavigateToAnalytics, 
+  onNavigateToAnalytics,
+  onLogout,
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Semua')
@@ -91,11 +93,11 @@ export default function PosPage({
           {/* Brand & Store Profile */}
           <div className="flex items-center gap-3 shrink-0">
             <div className="w-9 h-9 rounded-2xl bg-[#0071E3] flex items-center justify-center text-white shadow-sm shadow-[#0071E3]/25 font-bold">
-              K
+              {business?.name ? business.name.charAt(0).toUpperCase() : 'K'}
             </div>
             <div className="flex flex-col text-left">
               <span className="text-[15px] font-bold text-[#1D1D1F] tracking-tight leading-tight">
-                Kopi & Snack Makmur
+                {business?.name || 'Kopi & Snack Makmur'}
               </span>
               <span className="text-[11px] text-[#34C759] font-medium flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />
@@ -134,7 +136,7 @@ export default function PosPage({
             )}
           </div>
 
-          {/* Top Actions: Menu Management Settings Button */}
+          {/* Top Actions: Analytics, Menu Management, Logout */}
           <div className="flex items-center gap-2 shrink-0">
             {onNavigateToAnalytics && (
               <button
@@ -157,6 +159,21 @@ export default function PosPage({
                   <circle cx="12" cy="12" r="3" />
                 </svg>
                 <span>Kelola Menu</span>
+              </button>
+            )}
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                title="Keluar Akun"
+                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#FF3B30] bg-[#FF3B30]/8 hover:bg-[#FF3B30]/15 active:scale-95 px-3 py-2 rounded-xl transition-all cursor-pointer"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                <span className="hidden sm:inline">Keluar</span>
               </button>
             )}
           </div>
