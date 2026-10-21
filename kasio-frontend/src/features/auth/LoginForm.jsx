@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
+import { useAuth } from '../../hooks/useAuth'
 
 /**
- * LoginForm component with Apple-inspired visuals and interactive state simulation.
+ * LoginForm component with Apple-inspired visuals and Supabase Auth integration.
  * Includes email validation, password visibility toggle, remember-me toggle,
- * demo credentials filler, and mock authentication feedback.
+ * demo credentials filler, and error/success feedback.
  */
-export default function LoginForm({onLoginSuccess}) {
+export default function LoginForm({ onLoginSuccess }) {
+  const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -42,26 +44,46 @@ export default function LoginForm({onLoginSuccess}) {
     return Object.keys(nextErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
 
     setIsLoading(true)
     setAuthSuccess(false)
+    setErrors({})
 
-    // Simulate API authentication delay (UI only)
-    setTimeout(() => {
+    const res = await login(email, password)
+
+    if (!res.success) {
       setIsLoading(false)
-      setAuthSuccess(true)
-      if (onLoginSuccess) {
-        setTimeout(onLoginSuccess, 600)
-      }
-    }, 900)
+      setErrors({ general: res.error })
+      return
+    }
+
+    setIsLoading(false)
+    setAuthSuccess(true)
+    if (onLoginSuccess) {
+      setTimeout(onLoginSuccess, 500)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
-      {/* Success Banner Simulation */}
+      {/* Error Alert Banner */}
+      {errors.general && (
+        <div
+          role="alert"
+          className="p-3.5 bg-[#FF3B30]/10 border border-[#FF3B30]/25 rounded-2xl flex items-start gap-2.5 transition-all"
+        >
+          <span className="text-[#FF3B30] text-base shrink-0 mt-0.5">⚠️</span>
+          <div className="text-[13px] text-[#1D1D1F]">
+            <p className="font-semibold text-[#FF3B30]">Gagal Masuk</p>
+            <p className="text-[#86868B] mt-0.5">{errors.general}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Success Banner */}
       {authSuccess && (
         <div
           role="status"
@@ -75,14 +97,14 @@ export default function LoginForm({onLoginSuccess}) {
           >
             <path
               fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
               clipRule="evenodd"
             />
           </svg>
           <div className="text-[13px] text-[#1D1D1F]">
-            <p className="font-semibold text-[#34C759]">Simulasi Berhasil!</p>
+            <p className="font-semibold text-[#34C759]">Login Berhasil!</p>
             <p className="text-[#86868B] mt-0.5">
-                Login berhasil! Mengarahkan ke kasir...
+              Mengarahkan Anda ke halaman kasir...
             </p>
           </div>
         </div>
@@ -176,7 +198,7 @@ export default function LoginForm({onLoginSuccess}) {
             type="checkbox"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
-            className="w-4 h-4 rounded-md border-black/[0.16] text-[#0071E3] focus:ring-[#0071E3]/20 accent-[#0071E3]"
+            className="w-4 h-4 rounded-md border-black/16 text-[#0071E3] focus:ring-[#0071E3]/20 accent-[#0071E3]"
           />
           <span className="text-[#1D1D1F]">Ingat saya</span>
         </label>
