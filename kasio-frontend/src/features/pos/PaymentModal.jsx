@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { formatIDR } from '../../utils/formatters'
 import Button from '../../components/ui/Button'
+import { supabase } from '../../lib/supabase'
+import { formatIDR } from '../../utils/formatters'
 
 /**
  * PaymentModal component for Cashier checkout.
@@ -17,6 +18,7 @@ export default function PaymentModal({
   const [cashTendered, setCashTendered] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
   const [receiptData, setReceiptData] = useState(null)
+  const [paymentError, setPaymentError] = useState('')
 
   if (!isOpen) return null
 
@@ -34,23 +36,61 @@ export default function PaymentModal({
     setCashTendered(amount.toString())
   }
 
-  const handleConfirmPayment = () => {
+
+  const handleConfirmPayment = async () => {
+    if (isProcessing || cart.length === 0) return
+
+    if (paymentMethod === 'cash' && !isCashSufficient) {
+      setPaymentError('Uang tunai yang diterima belum mencukupi.')
+      return
+    }
+
+    setPaymentError('')
     setIsProcessing(true)
 
-    setTimeout(() => {
-      setIsProcessing(false)
+    try {
+      const { data, error } = await supabase.rpc('create_pos_order', {
+        p_items: cart.map(({ item, quantity }) => ({
+          menu_item_id: item.id,
+          quantity,
+        })),
+        p_payment_method: paymentMethod === 'cash' ? 'cash' : 'qris',
+        p_notes: null,
+      })
+
+      if (error) throw error
+
+      if (!data?.id || !data?.order_number) {
+        throw new Error('Respons transaksi dari database tidak lengkap.')
+      }
+
       const receipt = {
-        orderNumber: `INV-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`,
-        date: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }),
+        orderId: data.id,
+        orderNumber: data.order_number,
+        date: new Date(data.created_at).toLocaleString('id-ID'),
         items: cart,
-        totalAmount: grandTotal,
-        paymentMethod: paymentMethod === 'cash' ? 'Tunai' : 'QRIS Statis',
-        cashTendered: paymentMethod === 'cash' ? numericCash : grandTotal,
+        totalAmount: Number(data.total_amount),
+        paymentMethod:
+          data.payment_method === 'cash'
+            ? 'Tunai'
+            : 'QRIS Statis (konfirmasi manual)',
+        cashTendered:
+          paymentMethod === 'cash' ? numericCash : grandTotal,
         change: paymentMethod === 'cash' ? changeAmount : 0,
       }
+
       setReceiptData(receipt)
-      onPaymentSuccess(receipt)
-    }, 800)
+      onPaymentSuccess?.(receipt)
+    } catch (error) {
+      console.error('Gagal menyimpan transaksi:', error)
+
+      setPaymentError(
+        error.message ||
+        'Transaksi gagal disimpan. Silakan coba kembali.'
+      )
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   const handleCloseAll = () => {
@@ -163,28 +203,32 @@ export default function PaymentModal({
               <button
                 type="button"
                 onClick={() => setPaymentMethod('cash')}
-                className={`py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${
-                  paymentMethod === 'cash'
-                    ? 'bg-white text-[#1D1D1F] shadow-sm'
-                    : 'text-[#86868B] hover:text-[#1D1D1F]'
-                }`}
+                className={`py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${paymentMethod === 'cash'
+                  ? 'bg-white text-[#1D1D1F] shadow-sm'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  }`}
               >
                 💵 Tunai (Cash)
               </button>
               <button
                 type="button"
                 onClick={() => setPaymentMethod('qris')}
-                className={`py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${
-                  paymentMethod === 'qris'
-                    ? 'bg-white text-[#1D1D1F] shadow-sm'
-                    : 'text-[#86868B] hover:text-[#1D1D1F]'
-                }`}
+                className={`py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${paymentMethod === 'qris'
+                  ? 'bg-white text-[#1D1D1F] shadow-sm'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  }`}
               >
                 📱 QRIS Statis
               </button>
             </div>
 
             {/* Payment Mode Body */}
+
+            {paymentError && (
+              <p role="alert" className="text-sm text-red-600">
+                {paymentError}
+              </p>
+            )}
             {paymentMethod === 'cash' ? (
               <div className="space-y-4">
                 <div>
@@ -263,11 +307,10 @@ export default function PaymentModal({
                         {Array.from({ length: 36 }).map((_, i) => (
                           <div
                             key={i}
-                            className={`rounded-xs ${
-                              (i % 2 === 0 && i % 3 === 0) || i === 0 || i === 5 || i === 30 || i === 35
-                                ? 'bg-black'
-                                : 'bg-transparent'
-                            }`}
+                            className={`rounded-xs ${(i % 2 === 0 && i % 3 === 0) || i === 0 || i === 5 || i === 30 || i === 35
+                              ? 'bg-black'
+                              : 'bg-transparent'
+                              }`}
                           />
                         ))}
                       </div>
@@ -285,6 +328,7 @@ export default function PaymentModal({
                 <Button
                   variant="primary"
                   size="lg"
+                  disabled={isProcessing}
                   isLoading={isProcessing}
                   onClick={handleConfirmPayment}
                   className="w-full font-semibold bg-[#34C759] hover:bg-[#30B753] active:bg-[#289B46]"
