@@ -206,7 +206,7 @@ export default function MenuManagementPage({
               {searchQuery
                 ? 'Coba gunakan kata kunci pencarian yang lain.'
                 : 'Belum ada menu di kategori ini. Klik "Tambah Menu Baru" di atas.'}
-            </p>git add src/App.jsx src/features/products/AddMenuModal.jsx src/pages/MenuManagementPage.jsx
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
