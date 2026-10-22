@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react'
-import { formatIDR } from '../utils/formatters'
+import { useMemo, useState } from 'react'
 import Button from '../components/ui/Button'
 import AddMenuModal from '../features/products/AddMenuModal'
+import { formatIDR } from '../utils/formatters'
 
 /**
  * MenuManagementPage view: Dedicated screen for store owners to manage catalog.
@@ -16,7 +16,9 @@ export default function MenuManagementPage({
   onToggleAvailability,
   onNavigateToPos,
   onNavigateToLogin,
-  categories = ['Semua', 'Kopi', 'Non-Kopi', 'Makanan', 'Snack'],
+  categories = ['Semua'],
+  isLoading = false,
+  error = '',
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Semua')
@@ -38,10 +40,14 @@ export default function MenuManagementPage({
     })
   }, [menuItems, selectedCategory, searchQuery])
 
-  const confirmDelete = () => {
-    if (itemToDelete) {
-      onDeleteMenu(itemToDelete.id)
+  const confirmDelete = async () => {
+    if (!itemToDelete) return
+
+    try {
+      await onDeleteMenu(itemToDelete.id)
       setItemToDelete(null)
+    } catch (error) {
+      console.error('Gagal menghapus menu:', error)
     }
   }
 
@@ -92,6 +98,23 @@ export default function MenuManagementPage({
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+        {error && (
+          <div
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+          >
+            Gagal memproses data menu: {error}
+          </div>
+        )}
+
+        {isLoading && (
+          <div
+            role="status"
+            className="rounded-xl border border-black/6 bg-white p-6 text-center text-sm text-[#86868B]"
+          >
+            Memuat data menu dari database...
+          </div>
+        )}
         {/* Action Header Banner */}
         <div className="bg-white rounded-3xl p-5 sm:p-6 border border-black/6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -130,11 +153,10 @@ export default function MenuManagementPage({
                   key={category}
                   type="button"
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-[13px] font-semibold transition-all shrink-0 cursor-pointer ${
-                    isActive
-                      ? 'bg-[#1D1D1F] text-white shadow-sm'
-                      : 'bg-white hover:bg-black/4 text-[#86868B] hover:text-[#1D1D1F] border border-black/6'
-                  }`}
+                  className={`px-4 py-2 rounded-full text-[13px] font-semibold transition-all shrink-0 cursor-pointer ${isActive
+                    ? 'bg-[#1D1D1F] text-white shadow-sm'
+                    : 'bg-white hover:bg-black/4 text-[#86868B] hover:text-[#1D1D1F] border border-black/6'
+                    }`}
                 >
                   {category}
                 </button>
@@ -174,7 +196,7 @@ export default function MenuManagementPage({
         </div>
 
         {/* Menu Items Table / Card Grid */}
-        {filteredItems.length === 0 ? (
+        {isLoading ? null : filteredItems.length === 0 ? (
           <div className="p-12 text-center bg-white rounded-3xl border border-black/6 text-[#86868B]">
             <span className="text-3xl">🍽️</span>
             <p className="font-semibold text-[#1D1D1F] text-[15px] mt-2">
@@ -203,11 +225,10 @@ export default function MenuManagementPage({
                     <button
                       type="button"
                       onClick={() => onToggleAvailability(item.id)}
-                      className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full transition-all cursor-pointer ${
-                        item.isAvailable
-                          ? 'bg-[#34C759]/10 text-[#34C759] hover:bg-[#34C759]/20'
-                          : 'bg-[#FF3B30]/10 text-[#FF3B30] hover:bg-[#FF3B30]/20'
-                      }`}
+                      className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full transition-all cursor-pointer ${item.isAvailable
+                        ? 'bg-[#34C759]/10 text-[#34C759] hover:bg-[#34C759]/20'
+                        : 'bg-[#FF3B30]/10 text-[#FF3B30] hover:bg-[#FF3B30]/20'
+                        }`}
                       title="Klik untuk ubah status ketersediaan"
                     >
                       {item.isAvailable ? '● Tersedia' : '○ Habis'}
