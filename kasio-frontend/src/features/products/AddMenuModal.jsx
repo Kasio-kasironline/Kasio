@@ -1,27 +1,28 @@
-
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
-
-const EMOJI_OPTIONS = [
-  '☕', '🧊', '🍵', '🧋', '🍳', '🍜',
-  '🥪', '🍟', '🥟', '🍰', '🥤', '🍽️',
-]
+import { getInitials } from '../../utils/formatters'
+import { supabase } from '../../lib/supabase'
 
 export default function AddMenuModal({
   isOpen,
   onClose,
   onAddMenu,
   categories = [],
+  business,
 }) {
   const [name, setName] = useState('')
   const [category, setCategory] = useState(categories[1] || 'new')
   const [customCategory, setCustomCategory] = useState('')
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
-  const [selectedEmoji, setSelectedEmoji] = useState('☕')
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState('')
+  const [imageUrlInput, setImageUrlInput] = useState('')
+  const [showUrlInput, setShowUrlInput] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState({})
+  const fileInputRef = useRef(null)
 
   // Sesuaikan kategori awal jika data kategori baru selesai dimuat.
   useEffect(() => {
@@ -53,6 +54,30 @@ export default function AddMenuModal({
   }, [categories, customCategory])
 
   if (!isOpen) return null
+
+  const handleImageFileChange = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setErrors((prev) => ({ ...prev, image: 'File harus berupa gambar (PNG, JPG, atau WebP).' }))
+      return
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, image: 'Ukuran foto maksimal 2 MB.' }))
+      return
+    }
+
+    setErrors((prev) => ({ ...prev, image: '' }))
+    setImageFile(file)
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      setImagePreview(event.target?.result || '')
+    }
+    reader.readAsDataURL(file)
+  }
 
   const validate = () => {
     const nextErrors = {}
@@ -89,7 +114,11 @@ export default function AddMenuModal({
     setCustomCategory('')
     setPrice('')
     setDescription('')
-    setSelectedEmoji('☕')
+    setImageFile(null)
+    setImagePreview('')
+    setImageUrlInput('')
+    setShowUrlInput(false)
+    if (fileInputRef.current) fileInputRef.current.value = ''
     setErrors({})
   }
 
@@ -102,18 +131,46 @@ export default function AddMenuModal({
     const finalCategory =
       category === 'new' ? customCategory.trim() : category
 
-    const newItem = {
-      name: name.trim(),
-      category: finalCategory,
-      price: Number(price),
-      description: description.trim() || null,
-      image: selectedEmoji,
-      isAvailable: true,
-    }
+    setIsSaving(true)
+    setErrors((prev) => ({ ...prev, submit: '' }))
 
     try {
-      setIsSaving(true)
-      setErrors((prev) => ({ ...prev, submit: '' }))
+      let finalImageUrl = imagePreview || null
+
+      // Jika ada file yang diunggah, coba simpan ke Supabase Storage
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop() || 'png'
+        const filePath = `menu/${business?.id || 'default'}/menu_${Date.now()}.${fileExt}`
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('merchant-assets')
+          .upload(filePath, imageFile, {
+            upsert: true,
+            contentType: imageFile.type,
+          })
+
+        if (!uploadError && uploadData) {
+          const { data: publicUrlData } = supabase.storage
+            .from('merchant-assets')
+            .getPublicUrl(filePath)
+          if (publicUrlData?.publicUrl) {
+            finalImageUrl = publicUrlData.publicUrl
+          }
+        } else {
+          // Fallback: Jika bucket belum dibuat di dashboard, gunakan base64 data URL
+          console.warn('Storage bucket fallback to Data URL:', uploadError?.message)
+          finalImageUrl = imagePreview
+        }
+      }
+
+      const newItem = {
+        name: name.trim(),
+        category: finalCategory,
+        price: Number(price),
+        description: description.trim() || null,
+        image: finalImageUrl,
+        isAvailable: true,
+      }
 
       // Tunggu sampai insert ke Supabase berhasil.
       await onAddMenu(newItem)
@@ -139,9 +196,9 @@ export default function AddMenuModal({
       aria-labelledby="add-menu-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
     >
-      <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-2xl rounded-3xl border border-black/8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden p-6 sm:p-7 text-left">
+      <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-2xl rounded-3xl border border-black/8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden p-6 sm:p-7 text-left max-h-[92vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-black/6">
+        <div className="flex items-center justify-between pb-4 border-b border-black/6 shrink-0">
           <div>
             <h3
               id="add-menu-title"
@@ -166,7 +223,110 @@ export default function AddMenuModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4 overflow-y-auto flex-1 pr-1">
+          {/* Foto Menu & Inisial Placeholder */}
+          <div className="flex flex-col gap-2 text-left">
+            <div className="flex items-center justify-between">
+              <label className="text-[13px] font-medium text-[#1D1D1F]">
+                Foto Menu <span className="text-[#86868B] font-normal">(Opsional)</span>
+              </label>
+
+              {imagePreview && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImageFile(null)
+                    setImagePreview('')
+                    setImageUrlInput('')
+                    if (fileInputRef.current) fileInputRef.current.value = ''
+                  }}
+                  className="text-[12px] font-semibold text-[#FF3B30] hover:underline cursor-pointer"
+                >
+                  Hapus Foto
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-4 p-3.5 bg-[#F5F5F7] rounded-2xl border border-black/4">
+              {/* Box Preview: Foto atau Inisial (w-20 h-20 sm:w-24 sm:h-24) */}
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white border border-black/8 shadow-xs flex items-center justify-center overflow-hidden shrink-0 relative">
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="Preview Menu"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[#0071E3]/10 to-[#0071E3]/25 border border-[#0071E3]/15 flex flex-col items-center justify-center text-[#0071E3] select-none p-1">
+                    <span className="font-extrabold text-lg sm:text-xl tracking-wider">
+                      {getInitials(name)}
+                    </span>
+                    <span className="text-[9px] text-[#86868B] mt-0.5 uppercase tracking-tight font-medium">
+                      Inisial
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Controls */}
+              <div className="flex-1 min-w-0 space-y-1.5">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleImageFileChange}
+                  className="hidden"
+                  id="menu-photo-input"
+                />
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <label
+                    htmlFor="menu-photo-input"
+                    className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#1D1D1F] bg-white hover:bg-neutral-50 border border-black/10 px-3 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer active:scale-95"
+                  >
+                    <svg className="w-4 h-4 text-[#0071E3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <circle cx="12" cy="13" r="4" />
+                    </svg>
+                    <span>Pilih Foto</span>
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowUrlInput(!showUrlInput)}
+                    className="text-[12px] font-medium text-[#0071E3] hover:underline cursor-pointer"
+                  >
+                    {showUrlInput ? 'Tutup URL' : 'Gunakan Link URL'}
+                  </button>
+                </div>
+
+                <p className="text-[11px] text-[#86868B] leading-tight">
+                  Format PNG, JPG, WebP (maks 2MB). Jika tanpa foto, inisial produk otomatis digunakan.
+                </p>
+
+                {showUrlInput && (
+                  <input
+                    type="url"
+                    value={imageUrlInput}
+                    onChange={(e) => {
+                      setImageUrlInput(e.target.value)
+                      setImagePreview(e.target.value)
+                      setImageFile(null)
+                    }}
+                    placeholder="https://.../foto-menu.jpg"
+                    className="w-full px-3 py-1.5 text-[12px] bg-white rounded-xl border border-black/10 focus:border-[#0071E3] outline-none"
+                  />
+                )}
+              </div>
+            </div>
+
+            {errors.image && (
+              <p className="text-[12px] font-medium text-[#FF3B30] mt-0.5">
+                {errors.image}
+              </p>
+            )}
+          </div>
+
           {/* Nama Menu */}
           <Input
             label="Nama Menu"
@@ -179,7 +339,7 @@ export default function AddMenuModal({
                 setErrors((prev) => ({ ...prev, name: '' }))
               }
             }}
-            placeholder="Contoh: Kopi Susu Pandan"
+            placeholder="Contoh: Kopi Gula Aren"
             error={errors.name}
             required
           />
@@ -191,7 +351,7 @@ export default function AddMenuModal({
                 htmlFor="menu-category"
                 className="text-[13px] font-medium text-[#1D1D1F]"
               >
-                Kategori <span className="text-[#FF3B30">*</span>
+                Kategori <span className="text-[#FF3B30]">*</span>
               </label>
 
               <select
@@ -215,7 +375,9 @@ export default function AddMenuModal({
                     </option>
                   ))}
 
-                <option value="new">+ Kategori Baru...</option>
+                {categories.filter((item) => item !== 'Semua').length < 5 && (
+                  <option value="new">+ Kategori Baru...</option>
+                )}
               </select>
 
               {category === 'new' && (
@@ -288,32 +450,6 @@ export default function AddMenuModal({
             />
           </div>
 
-          {/* Pemilihan Ikon */}
-          <div className="flex flex-col gap-1.5 text-left">
-            <label className="text-[13px] font-medium text-[#1D1D1F]">
-              Pilih Ikon Menu
-            </label>
-
-            <div className="flex flex-wrap gap-2 p-2.5 bg-[#F5F5F7] rounded-2xl border border-black/4">
-              {EMOJI_OPTIONS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  onClick={() => setSelectedEmoji(emoji)}
-                  aria-label={`Pilih ikon ${emoji}`}
-                  aria-pressed={selectedEmoji === emoji}
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all cursor-pointer ${
-                    selectedEmoji === emoji
-                      ? 'bg-white shadow-sm ring-2 ring-[#0071E3] scale-105'
-                      : 'hover:bg-white/60'
-                  }`}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Pesan error dari proses penyimpanan */}
           {errors.submit && (
             <p
@@ -328,7 +464,7 @@ export default function AddMenuModal({
           <div className="pt-3 flex items-center justify-end gap-2.5 border-t border-black/6">
             <Button
               type="button"
-              variant="secondary"
+              variant="destructive"
               size="md"
               onClick={onClose}
               disabled={isSaving}

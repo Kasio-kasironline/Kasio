@@ -12,7 +12,10 @@ export default function CartPanel({
   onRemoveItem,
   onClearCart,
   onProceedToPayment,
+  onOpenPayment,
 }) {
+  // Dukung kedua nama prop agar tidak pernah gagal membuka modal
+  const handleProceed = onProceedToPayment || onOpenPayment
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
   const grandTotal = cart.reduce(
     (sum, item) => sum + item.item.price * item.quantity,
@@ -98,28 +101,27 @@ export default function CartPanel({
                     <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M3 6h18" />
                       <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                     </svg>
                     <span>Hapus</span>
                   </button>
 
-                  <div className="inline-flex items-center gap-2 bg-[#F5F5F7] rounded-xl px-2 py-1 border border-black/[0.04]">
+                  <div className="flex items-center gap-1.5 bg-[#F5F5F7] rounded-xl p-1 border border-black/[0.04]">
                     <button
                       type="button"
                       onClick={() => onUpdateQuantity(item.id, quantity - 1)}
-                      aria-label="Kurangi 1"
-                      className="w-6 h-6 rounded-lg bg-white shadow-xs text-[#1D1D1F] hover:bg-neutral-100 flex items-center justify-center font-bold text-xs transition-all active:scale-95 cursor-pointer"
+                      aria-label="Kurangi kuantitas"
+                      className="w-6 h-6 rounded-lg bg-white shadow-xs text-[#1D1D1F] flex items-center justify-center font-bold text-sm hover:bg-neutral-50 active:scale-95 transition-all cursor-pointer"
                     >
                       -
                     </button>
-                    <span className="w-5 text-center text-[13px] font-semibold text-[#1D1D1F]">
+                    <span className="w-6 text-center text-[13px] font-bold text-[#1D1D1F] select-none">
                       {quantity}
                     </span>
                     <button
                       type="button"
                       onClick={() => onUpdateQuantity(item.id, quantity + 1)}
-                      aria-label="Tambah 1"
-                      className="w-6 h-6 rounded-lg bg-white shadow-xs text-[#1D1D1F] hover:bg-neutral-100 flex items-center justify-center font-bold text-xs transition-all active:scale-95 cursor-pointer"
+                      aria-label="Tambah kuantitas"
+                      className="w-6 h-6 rounded-lg bg-white shadow-xs text-[#1D1D1F] flex items-center justify-center font-bold text-sm hover:bg-neutral-50 active:scale-95 transition-all cursor-pointer"
                     >
                       +
                     </button>
@@ -131,12 +133,12 @@ export default function CartPanel({
         )}
       </div>
 
-      {/* Footer / Summary Docket */}
+      {/* Cart Summary & Checkout Action */}
       <div className="p-4 sm:p-5 border-t border-black/[0.06] bg-neutral-50/50 space-y-3">
         <div className="space-y-1.5 text-[13px]">
           <div className="flex justify-between text-[#86868B]">
-            <span>Subtotal</span>
-            <span className="font-medium text-[#1D1D1F]">{formatIDR(grandTotal)}</span>
+            <span>Subtotal Produk</span>
+            <span className="font-semibold text-[#1D1D1F]">{formatIDR(grandTotal)}</span>
           </div>
           <div className="flex justify-between text-[#86868B]">
             <span>Pajak Resto (PB1)</span>
@@ -158,7 +160,7 @@ export default function CartPanel({
           variant="primary"
           size="lg"
           disabled={cart.length === 0}
-          onClick={onProceedToPayment}
+          onClick={handleProceed}
           className="w-full font-semibold shadow-sm justify-between px-5"
         >
           <span>Lanjut ke Pembayaran</span>

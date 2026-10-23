@@ -79,13 +79,15 @@ export default function AnalyticsPage({ onNavigateToPos }) {
           <div className="flex items-center gap-3">
             {onNavigateToPos && (
               <button
-                type="button"
-                onClick={onNavigateToPos}
-                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/10 active:scale-95 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-              >
-                <span>←</span>
-                <span>Kasir POS</span>
-              </button>
+              type="button"
+              onClick={onNavigateToPos}
+              className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#0071E3] hover:bg-[#0071E3]/10 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+              <span>Kembali ke Kasir</span>
+            </button>
             )}
 
             <div className="h-5 w-px bg-black/10 hidden sm:block" />

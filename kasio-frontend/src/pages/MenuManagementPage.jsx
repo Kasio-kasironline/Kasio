@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import Button from '../components/ui/Button'
 import AddMenuModal from '../features/products/AddMenuModal'
-import { formatIDR } from '../utils/formatters'
+import StoreSettingsModal from '../features/settings/StoreSettingsModal'
+import { formatIDR, getInitials } from '../utils/formatters'
 
 /**
  * MenuManagementPage view: Dedicated screen for store owners to manage catalog.
  * Supports adding new menu items, deleting existing items, toggling stock availability,
- * and live search / category filtering.
+ * live search / category filtering, and store settings (QRIS & max 5 categories).
  * Follows Apple HIG layout principles.
  */
 export default function MenuManagementPage({
@@ -15,14 +16,19 @@ export default function MenuManagementPage({
   onDeleteMenu,
   onToggleAvailability,
   onNavigateToPos,
-  onNavigateToLogin,
   categories = ['Semua'],
+  categoryList = [],
+  business,
+  onAddCategory,
+  onDeleteCategory,
+  onUpdateBusinessQris,
   isLoading = false,
   error = '',
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Semua')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
 
   // Filtered menu items
@@ -76,22 +82,24 @@ export default function MenuManagementPage({
                 Kelola Menu & Katalog
               </span>
               <span className="text-[11px] text-[#86868B]">
-                Kopi & Snack Makmur
+                {business?.name || 'Toko Saya'}
               </span>
             </div>
           </div>
 
-          {/* Right Navigation: Logout / Switch to Login */}
+          {/* Right Navigation: Additional Settings Button (replaces logout) */}
           <div className="flex items-center gap-2">
-            {onNavigateToLogin && (
-              <button
-                type="button"
-                onClick={onNavigateToLogin}
-                className="text-[13px] font-medium text-[#86868B] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-              >
-                Keluar Akun
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setIsSettingsModalOpen(true)}
+              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/8 active:scale-95 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
+            >
+              <svg className="w-4 h-4 text-[#86868B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+              <span>Pengaturan Tambahan</span>
+            </button>
           </div>
         </div>
       </header>
@@ -115,14 +123,15 @@ export default function MenuManagementPage({
             Memuat data menu dari database...
           </div>
         )}
-        {/* Action Header Banner */}
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-black/6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+
+        {/* Action Header: Title and Add Menu Button */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-[#1D1D1F] tracking-tight">
-              Daftar Menu Toko
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1D1D1F]">
+              Daftar Menu Produk
             </h1>
             <p className="text-[13px] text-[#86868B] mt-0.5">
-              Total <strong>{menuItems.length} menu</strong> terdaftar dalam sistem kasir Anda.
+              Tambah, edit status ketersediaan, atau hapus menu dari katalog toko.
             </p>
           </div>
 
@@ -130,15 +139,13 @@ export default function MenuManagementPage({
             variant="primary"
             size="md"
             onClick={() => setIsAddModalOpen(true)}
-            className="shadow-sm font-semibold shrink-0"
-            icon={
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-            }
+            className="self-start sm:self-auto inline-flex items-center gap-1.5 shadow-sm"
           >
-            Tambah Menu Baru
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Tambah Menu Baru</span>
           </Button>
         </div>
 
@@ -236,28 +243,40 @@ export default function MenuManagementPage({
                   </div>
 
                   {/* Thumbnail, Name, and Description */}
-                  <div className="flex items-start gap-3">
-                    <div className="w-13 h-13 rounded-xl bg-[#F5F5F7] border border-black/4 flex items-center justify-center text-2xl shrink-0 select-none">
-                      {item.image || '🍽️'}
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-[#F5F5F7] border border-black/8 flex items-center justify-center shrink-0 overflow-hidden select-none shadow-xs">
+                      {item.image && (item.image.startsWith('http') || item.image.startsWith('data:')) ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : item.image && item.image.length <= 4 && !item.image.includes('/') ? (
+                        <span className="text-2xl">{item.image}</span>
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-[#0071E3]/10 to-[#0071E3]/20 border border-[#0071E3]/15 flex items-center justify-center text-[#0071E3] font-extrabold text-base tracking-wider">
+                          {getInitials(item.name)}
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-[15px] text-[#1D1D1F] truncate leading-snug">
                         {item.name}
                       </h3>
                       <p className="text-[12px] text-[#86868B] line-clamp-2 mt-0.5 leading-relaxed">
-                        {item.description}
+                        {item.description || 'Tidak ada deskripsi.'}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Bottom Footer: Price and Delete Action */}
+                {/* Price and Delete Action Footer */}
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-black/4">
-                  <div>
+                  <div className="flex flex-col">
                     <span className="text-[10px] text-[#86868B] uppercase font-medium">Harga</span>
-                    <p className="text-[16px] font-bold text-[#1D1D1F] leading-tight">
+                    <span className="text-[15px] font-bold text-[#1D1D1F]">
                       {formatIDR(item.price)}
-                    </p>
+                    </span>
                   </div>
 
                   <button
@@ -285,6 +304,19 @@ export default function MenuManagementPage({
         onClose={() => setIsAddModalOpen(false)}
         onAddMenu={onAddMenu}
         categories={categories}
+        business={business}
+      />
+
+      {/* Store Settings Modal: QRIS & Categories */}
+      <StoreSettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        business={business}
+        categoryList={categoryList}
+        menuItems={menuItems}
+        onAddCategory={onAddCategory}
+        onDeleteCategory={onDeleteCategory}
+        onUpdateBusinessQris={onUpdateBusinessQris}
       />
 
       {/* Confirmation Modal for Delete */}
