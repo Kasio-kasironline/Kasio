@@ -13,6 +13,7 @@ export default function PaymentModal({
   onClose,
   cart = [],
   onPaymentSuccess,
+  business,
 }) {
   const [paymentMethod, setPaymentMethod] = useState('cash') // 'cash' | 'qris'
   const [cashTendered, setCashTendered] = useState('')
@@ -300,28 +301,40 @@ export default function PaymentModal({
               <div className="space-y-4">
                 {/* QRIS Display Container */}
                 <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-black/[0.08] shadow-inner text-center">
-                  <div className="w-48 h-48 rounded-xl bg-neutral-900 flex flex-col items-center justify-center text-white p-3 relative overflow-hidden shadow-md">
-                    {/* Mock QR graphic */}
-                    <div className="w-full h-full bg-white p-2 rounded-lg flex flex-col items-center justify-center">
-                      <div className="grid grid-cols-6 gap-1 w-full h-full p-1 border-2 border-black">
-                        {Array.from({ length: 36 }).map((_, i) => (
-                          <div
-                            key={i}
-                            className={`rounded-xs ${(i % 2 === 0 && i % 3 === 0) || i === 0 || i === 5 || i === 30 || i === 35
-                              ? 'bg-black'
-                              : 'bg-transparent'
-                              }`}
-                          />
-                        ))}
+                  {business?.qris_image_url ? (
+                    <div className="w-52 h-52 rounded-xl bg-white flex items-center justify-center p-2 border border-black/10 shadow-sm overflow-hidden">
+                      <img
+                        src={business.qris_image_url}
+                        alt={`QRIS ${business.name || 'Toko'}`}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-48 h-48 rounded-xl bg-neutral-900 flex flex-col items-center justify-center text-white p-3 relative overflow-hidden shadow-md">
+                      {/* Mock QR graphic */}
+                      <div className="w-full h-full bg-white p-2 rounded-lg flex flex-col items-center justify-center">
+                        <div className="grid grid-cols-6 gap-1 w-full h-full p-1 border-2 border-black">
+                          {Array.from({ length: 36 }).map((_, i) => (
+                            <div
+                              key={i}
+                              className={`rounded-xs ${(i % 2 === 0 && i % 3 === 0) || i === 0 || i === 5 || i === 30 || i === 35
+                                ? 'bg-black'
+                                : 'bg-transparent'
+                                }`}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
-                  <span className="text-[13px] font-bold text-[#1D1D1F] mt-3">
-                    QRIS TOKO KOPI & SNACK MAKMUR
+                  <span className="text-[13px] font-bold text-[#1D1D1F] mt-3 uppercase tracking-tight">
+                    {business?.name ? `QRIS ${business.name}` : 'QRIS TOKO SAYA'}
                   </span>
                   <p className="text-[12px] text-[#86868B] mt-1 max-w-[260px] leading-relaxed">
-                    Arahkan pelanggan memindai QRIS di atas melalui mobile banking atau e-wallet (GoPay, OVO, Dana).
+                    {business?.qris_image_url
+                      ? 'Arahkan pelanggan memindai QRIS di atas melalui mobile banking atau e-wallet (GoPay, OVO, Dana).'
+                      : 'Belum ada QRIS toko yang diunggah. Atur foto QRIS Anda melalui menu Kelola Menu > Pengaturan Tambahan.'}
                   </p>
                 </div>
 

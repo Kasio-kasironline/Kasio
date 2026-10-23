@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase'
 import LoginPage from './pages/LoginPage'
@@ -10,7 +9,7 @@ import { AuthProvider } from './context/AuthProvider'
 import { useAuth } from './hooks/useAuth'
 
 function AppContent() {
-  const { user, business, isLoading, logout } = useAuth()
+  const { user, business, isLoading, logout, refreshBusiness } = useAuth()
 
   // Pilihan tampilan
   const [currentView, setCurrentView] = useState('pos')
@@ -18,6 +17,7 @@ function AppContent() {
   // State menu dan kategori dari Supabase
   const [menuItems, setMenuItems] = useState([])
   const [categories, setCategories] = useState(['Semua'])
+  const [categoryList, setCategoryList] = useState([])
   const [menuLoading, setMenuLoading] = useState(true)
   const [menuError, setMenuError] = useState('')
 
@@ -29,6 +29,7 @@ function AppContent() {
       if (!user || !business?.id) {
         setMenuItems([])
         setCategories(['Semua'])
+        setCategoryList([])
         setMenuLoading(false)
         return
       }
@@ -75,11 +76,12 @@ function AppContent() {
           categoryId: item.category_id,
           price: Number(item.price),
           description: item.description || '',
-          image: item.image_url || '🍽️',
+          image: item.image_url || null,
           isAvailable: item.is_available,
         }))
 
         if (!cancelled) {
+          setCategoryList(categoryResult.data)
           setCategories(['Semua', ...categoryNames])
           setMenuItems(mappedMenuItems)
         }
@@ -126,6 +128,11 @@ function AppContent() {
 
     if (existingCategory) return existingCategory
 
+    // Validasi batas maksimal 5 kategori
+    if (existingCategories.length >= 5) {
+      throw new Error('Maksimal 5 kategori telah tercapai. Kelola kategori di Pengaturan Tambahan.')
+    }
+
     const { data: createdCategory, error: createError } =
       await supabase
         .from('categories')
@@ -138,7 +145,89 @@ function AppContent() {
 
     if (createError) throw createError
 
+    setCategoryList((prev) => [...prev, createdCategory])
     return createdCategory
+  }
+
+  // Tambah kategori baru secara manual (maksimal 5 kategori)
+  async function handleAddCategory(categoryName) {
+    if (!business?.id) {
+      throw new Error('Data usaha belum tersedia.')
+    }
+
+    const name = categoryName.trim()
+    if (!name || name.toLowerCase() === 'semua' || name.toLowerCase() === 'tanpa kategori') {
+      throw new Error('Nama kategori tidak valid.')
+    }
+
+    if (categoryList.length >= 5) {
+      throw new Error('Maksimal 5 kategori telah tercapai.')
+    }
+
+    if (categoryList.some((c) => c.name.toLowerCase() === name.toLowerCase())) {
+      throw new Error('Kategori dengan nama tersebut sudah ada.')
+    }
+
+    const { data, error } = await supabase
+      .from('categories')
+      .insert({
+        business_id: business.id,
+        name,
+      })
+      .select('id, name')
+      .single()
+
+    if (error) throw error
+
+    setCategoryList((prev) => [...prev, data])
+    setCategories((prev) => [...prev, data.name])
+    return data
+  }
+
+  // Hapus kategori dari Supabase
+  async function handleDeleteCategory(categoryId, categoryName) {
+    if (!business?.id) return
+
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', categoryId)
+      .eq('business_id', business.id)
+
+    if (error) throw error
+
+    setCategoryList((prev) => prev.filter((c) => c.id !== categoryId))
+    setCategories((prev) => prev.filter((c) => c !== categoryName))
+    setMenuItems((prev) =>
+      prev.map((item) =>
+        item.categoryId === categoryId
+          ? { ...item, category: 'Tanpa Kategori', categoryId: null }
+          : item
+      )
+    )
+  }
+
+  // Simpan / update foto QRIS usaha
+  async function handleUpdateBusinessQris(qrisUrl) {
+    if (!business?.id) throw new Error('Data usaha belum tersedia.')
+
+    const { data, error } = await supabase
+      .from('businesses')
+      .update({
+        qris_image_url: qrisUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', business.id)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    if (refreshBusiness) {
+      await refreshBusiness()
+    }
+
+    return data
   }
 
   // Tambah menu ke Supabase
@@ -160,7 +249,7 @@ function AppContent() {
           name: newItem.name.trim(),
           description: newItem.description || null,
           price: Number(newItem.price),
-          image_url: null,
+          image_url: newItem.image || null,
           is_available: true,
         })
         .select(
@@ -177,7 +266,7 @@ function AppContent() {
         categoryId: data.category_id,
         price: Number(data.price),
         description: data.description || '',
-        image: newItem.image || '🍽️',
+        image: data.image_url || null,
         isAvailable: data.is_available,
       }
 
@@ -192,6 +281,64 @@ function AppContent() {
       setMenuItems((prev) => [savedItem, ...prev])
     } catch (error) {
       console.error('Gagal menambahkan menu:', error)
+      throw error
+    }
+  }
+
+    // Update menu di Supabase
+  async function handleUpdateMenu(updatedItem) {
+    if (!business?.id) {
+      throw new Error('Data usaha belum tersedia.')
+    }
+
+    setMenuError('')
+
+    try {
+      const category = await getOrCreateCategory(updatedItem.category)
+
+      const { data, error } = await supabase
+        .from('menu_items')
+        .update({
+          category_id: category.id,
+          name: updatedItem.name.trim(),
+          description: updatedItem.description || null,
+          price: Number(updatedItem.price),
+          image_url: updatedItem.image || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', updatedItem.id)
+        .eq('business_id', business.id)
+        .select(
+          'id, business_id, category_id, name, description, price, image_url, is_available'
+        )
+        .single()
+
+      if (error) throw error
+
+      setMenuItems((prev) =>
+        prev.map((item) =>
+          item.id === updatedItem.id
+            ? {
+                ...item,
+                name: data.name,
+                category: category.name,
+                categoryId: data.category_id,
+                price: Number(data.price),
+                description: data.description || '',
+                image: data.image_url || null,
+                isAvailable: data.is_available,
+              }
+            : item
+        )
+      )
+
+      setCategories((prev) =>
+        prev.some((name) => name.toLowerCase() === category.name.toLowerCase())
+          ? prev
+          : [...prev, category.name]
+      )
+    } catch (error) {
+      console.error('Gagal memperbarui menu:', error)
       throw error
     }
   }
@@ -225,16 +372,17 @@ function AppContent() {
   async function handleToggleAvailability(itemId) {
     if (!business?.id) return
 
-    const item = menuItems.find((menu) => menu.id === itemId)
-
-    if (!item) return
+    const targetItem = menuItems.find((item) => item.id === itemId)
+    if (!targetItem) return
 
     setMenuError('')
 
     try {
+      const nextStatus = !targetItem.isAvailable
+
       const { data, error } = await supabase
         .from('menu_items')
-        .update({ is_available: !item.isAvailable })
+        .update({ is_available: nextStatus })
         .eq('id', itemId)
         .eq('business_id', business.id)
         .select('id, is_available')
@@ -243,10 +391,10 @@ function AppContent() {
       if (error) throw error
 
       setMenuItems((prev) =>
-        prev.map((menu) =>
-          menu.id === itemId
-            ? { ...menu, isAvailable: data.is_available }
-            : menu
+        prev.map((item) =>
+          item.id === itemId
+            ? { ...item, isAvailable: data.is_available }
+            : item
         )
       )
     } catch (error) {
@@ -257,7 +405,7 @@ function AppContent() {
     }
   }
 
-  // Loading autentikasi
+  // Layar loading awal
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F5F5F7] flex flex-col items-center justify-center p-4">
@@ -272,7 +420,7 @@ function AppContent() {
     )
   }
 
-  // Jika belum login, tampilkan Login atau Register
+  // Jika belum login
   if (!user) {
     if (currentView === 'register') {
       return (
@@ -291,7 +439,7 @@ function AppContent() {
     )
   }
 
-  // Jika sudah login, jangan tampilkan halaman autentikasi
+  // Jika user sudah login tapi mencoba ke login/register
   if (currentView === 'login' || currentView === 'register') {
     return (
       <PosPage
@@ -311,16 +459,18 @@ function AppContent() {
       <MenuManagementPage
         menuItems={menuItems}
         categories={categories}
+        categoryList={categoryList}
+        business={business}
         isLoading={menuLoading}
         error={menuError}
         onAddMenu={handleAddMenu}
+        onUpdateMenu={handleUpdateMenu}
         onDeleteMenu={handleDeleteMenu}
         onToggleAvailability={handleToggleAvailability}
+        onAddCategory={handleAddCategory}
+        onDeleteCategory={handleDeleteCategory}
+        onUpdateBusinessQris={handleUpdateBusinessQris}
         onNavigateToPos={() => setCurrentView('pos')}
-        onNavigateToLogin={() => {
-          logout()
-          setCurrentView('login')
-        }}
       />
     )
   }
