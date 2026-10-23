@@ -36,27 +36,31 @@ export default function MenuCard({
         </div>
 
         {/* Thumbnail and Title Row */}
-        <div className="flex items-start gap-3.5">
-          <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-2xl bg-[#F5F5F7] border border-black/8 flex items-center justify-center shrink-0 overflow-hidden select-none shadow-xs">
+        <div className="flex items-start gap-3">
+          <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-[#F5F5F7] border border-black/8 flex items-center justify-center shrink-0 overflow-hidden select-none shadow-xs">
             {image && (image.startsWith('http') || image.startsWith('data:')) ? (
               <img
                 src={image}
                 alt={name}
                 className="w-full h-full object-cover"
               />
-            ) : image && image.length <= 4 && !image.includes('/') ? (
-              <span className="text-3xl">{image}</span>
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[#0071E3]/10 to-[#0071E3]/20 border border-[#0071E3]/15 flex items-center justify-center text-[#0071E3] font-extrabold text-base sm:text-lg tracking-wider">
+              <div className="w-full h-full bg-gradient-to-br from-[#0071E3]/10 to-[#0071E3]/20 border border-[#0071E3]/15 flex items-center justify-center text-[#0071E3] font-extrabold text-base tracking-wider">
                 {getInitials(name)}
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-[14px] sm:text-[15px] text-[#1D1D1F] tracking-tight leading-snug line-clamp-2">
+            <h3
+              className="font-semibold text-[14px] sm:text-[15px] text-[#1D1D1F] tracking-tight leading-snug line-clamp-2"
+              title={name}
+            >
               {name}
             </h3>
-            <p className="text-[12px] text-[#86868B] line-clamp-2 mt-1 leading-relaxed">
+            <p
+              className="text-[12px] text-[#86868B] line-clamp-2 mt-1 leading-relaxed"
+              title={description}
+            >
               {description}
             </p>
           </div>

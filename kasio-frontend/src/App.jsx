@@ -285,6 +285,64 @@ function AppContent() {
     }
   }
 
+    // Update menu di Supabase
+  async function handleUpdateMenu(updatedItem) {
+    if (!business?.id) {
+      throw new Error('Data usaha belum tersedia.')
+    }
+
+    setMenuError('')
+
+    try {
+      const category = await getOrCreateCategory(updatedItem.category)
+
+      const { data, error } = await supabase
+        .from('menu_items')
+        .update({
+          category_id: category.id,
+          name: updatedItem.name.trim(),
+          description: updatedItem.description || null,
+          price: Number(updatedItem.price),
+          image_url: updatedItem.image || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', updatedItem.id)
+        .eq('business_id', business.id)
+        .select(
+          'id, business_id, category_id, name, description, price, image_url, is_available'
+        )
+        .single()
+
+      if (error) throw error
+
+      setMenuItems((prev) =>
+        prev.map((item) =>
+          item.id === updatedItem.id
+            ? {
+                ...item,
+                name: data.name,
+                category: category.name,
+                categoryId: data.category_id,
+                price: Number(data.price),
+                description: data.description || '',
+                image: data.image_url || null,
+                isAvailable: data.is_available,
+              }
+            : item
+        )
+      )
+
+      setCategories((prev) =>
+        prev.some((name) => name.toLowerCase() === category.name.toLowerCase())
+          ? prev
+          : [...prev, category.name]
+      )
+    } catch (error) {
+      console.error('Gagal memperbarui menu:', error)
+      throw error
+    }
+  }
+
   // Hapus menu dari Supabase
   async function handleDeleteMenu(itemId) {
     if (!business?.id) return
@@ -406,6 +464,7 @@ function AppContent() {
         isLoading={menuLoading}
         error={menuError}
         onAddMenu={handleAddMenu}
+        onUpdateMenu={handleUpdateMenu}
         onDeleteMenu={handleDeleteMenu}
         onToggleAvailability={handleToggleAvailability}
         onAddCategory={handleAddCategory}
