@@ -30,7 +30,6 @@ export default function SalesBarChart({ chartData = [], period = 'today' }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-black/[0.04]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-base">📈</span>
             <h3 className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight">
               Grafik Tren Penjualan
             </h3>
@@ -40,7 +39,7 @@ export default function SalesBarChart({ chartData = [], period = 'today' }) {
 
         {peakItem && peakItem.revenue > 0 && (
           <div className="inline-flex items-center gap-1.5 self-start sm:self-auto bg-[#0071E3]/8 px-3 py-1.5 rounded-full text-[11px] font-semibold text-[#0071E3]">
-            <span>⚡ Puncak:</span>
+            <span>Puncak:</span>
             <span className="font-bold">{formatIDR(peakItem.revenue)}</span>
             <span className="text-[#86868B]">({peakItem.dayLabel || peakItem.dayName})</span>
           </div>

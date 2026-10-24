@@ -4,6 +4,7 @@ import Button from '../../components/ui/Button'
 import { getInitials } from '../../utils/formatters'
 import { compressImage } from '../../utils/imageCompressor'
 import { supabase } from '../../lib/supabase'
+import { Trash, Camera } from 'lucide-react'
 
 /**
  * EditMenuModal component:
@@ -235,7 +236,7 @@ export default function EditMenuModal({
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
         <div
-          className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-black/8 relative max-h-[92vh] overflow-y-auto"
+          className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-black/8 relative max-h-[92vh] overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header Modal */}
@@ -449,16 +450,7 @@ export default function EditMenuModal({
                       htmlFor="edit-menu-photo-input"
                       className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#1D1D1F] bg-white hover:bg-neutral-50 border border-black/10 px-3 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer active:scale-95"
                     >
-                      <svg
-                        className="w-4 h-4 text-[#0071E3]"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                        <circle cx="12" cy="13" r="4" />
-                      </svg>
+                      <Camera className="text-[#0071E3] w-4 h-4"/>
                       <span>Ganti Foto</span>
                     </label>
 
@@ -512,38 +504,18 @@ export default function EditMenuModal({
                 disabled={isSaving || isDeleting}
                 className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#FF3B30] hover:text-[#D70015] hover:bg-[#FF3B30]/10 px-3 py-2 rounded-xl transition-all active:scale-95 cursor-pointer disabled:opacity-50"
               >
-                <svg
-                  className="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M3 6h18" />
-                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                </svg>
+                <Trash className="w-4 h-4"/>
                 <span>Hapus Menu</span>
               </button>
 
               <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="md"
-                  onClick={onClose}
-                  disabled={isSaving || isDeleting}
-                >
-                  Batal
-                </Button>
-
                 <Button
                   type="submit"
                   variant="primary"
                   size="md"
                   disabled={isSaving || isDeleting}
                 >
-                  {isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
+                  {isSaving ? 'Menyimpan...' : 'Simpan'}
                 </Button>
               </div>
             </div>
@@ -559,17 +531,7 @@ export default function EditMenuModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-12 h-12 rounded-full bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center mx-auto">
-              <svg
-                className="w-6 h-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M3 6h18" />
-                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-              </svg>
+              <Trash className="w-4 h-4"/>
             </div>
 
             <div>

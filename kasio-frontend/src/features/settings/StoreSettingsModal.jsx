@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import Button from '../../components/ui/Button'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../utils/imageCompressor'
+import { Settings, QrCode, Tag, Trash, Lock, TriangleAlert, Plus} from 'lucide-react'
 
 /**
  * StoreSettingsModal component:
@@ -34,6 +35,7 @@ export default function StoreSettingsModal({
   const [isAddingCategory, setIsAddingCategory] = useState(false)
   const [deletingId, setDeletingId] = useState(null)
   const [categoryMessage, setCategoryMessage] = useState({ type: '', text: '' })
+  const [categoryToDelete, setCategoryToDelete] = useState(null)
 
   if (!isOpen) return null
 
@@ -182,11 +184,18 @@ export default function StoreSettingsModal({
     }
   }
 
-  const handleDeleteCategoryItem = async (cat) => {
+    const handleDeleteCategoryItem = async (cat) => {
     const count = menuItems.filter(
       (m) => m.categoryId === cat.id || m.category?.toLowerCase() === cat.name.toLowerCase()
     ).length
 
+    // Jika ini kategori terakhir (sisa 1), buka pop up peringatan khusus
+    if (categoryList.length <= 1) {
+      setCategoryToDelete({ cat, count, isLast: true })
+      return
+    }
+
+    // Jika bukan kategori terakhir, konfirmasi biasa
     const confirmMsg =
       count > 0
         ? `Kategori "${cat.name}" memiliki ${count} menu terkait. Jika dihapus, menu tersebut akan berstatus "Tanpa Kategori". Lanjutkan?`
@@ -194,8 +203,13 @@ export default function StoreSettingsModal({
 
     if (!confirm(confirmMsg)) return
 
+    executeDeleteCategory(cat)
+  }
+
+  const executeDeleteCategory = async (cat) => {
     setDeletingId(cat.id)
     setCategoryMessage({ type: '', text: '' })
+    setCategoryToDelete(null)
 
     try {
       await onDeleteCategory(cat.id, cat.name)
@@ -214,9 +228,7 @@ export default function StoreSettingsModal({
         {/* Header */}
         <div className="p-5 pb-3 border-b border-black/6 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-black/5 flex items-center justify-center text-[#1D1D1F]">
-              ⚙️
-            </div>
+            <Settings className="w-4 h-4"/>
             <div>
               <h2 className="text-[16px] font-bold text-[#1D1D1F] tracking-tight">
                 Pengaturan Tambahan
@@ -237,22 +249,23 @@ export default function StoreSettingsModal({
         </div>
 
         {/* Apple-style Segmented Navigation Tabs */}
-        <div className="px-5 pt-3">
-          <div className="flex items-center p-1 bg-black/4 rounded-xl">
+        <div className="px-4 sm:px-5 pt-3">
+          <div className="flex items-center p-1 bg-black/4 rounded-2xl gap-1">
             <button
               type="button"
               onClick={() => {
                 setActiveTab('qris')
                 setQrisMessage({ type: '', text: '' })
               }}
-              className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-2 text-[12px] sm:text-[13px] font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'qris'
                   ? 'bg-white text-[#1D1D1F] shadow-xs'
                   : 'text-[#86868B] hover:text-[#1D1D1F]'
               }`}
             >
-              <span>📱</span>
-              <span>QRIS Pembayaran</span>
+              <QrCode className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">QRIS Pembayaran</span>
+              <span className="sm:hidden">QRIS</span>
             </button>
 
             <button
@@ -261,20 +274,24 @@ export default function StoreSettingsModal({
                 setActiveTab('categories')
                 setCategoryMessage({ type: '', text: '' })
               }}
-              className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-2 text-[12px] sm:text-[13px] font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'categories'
                   ? 'bg-white text-[#1D1D1F] shadow-xs'
                   : 'text-[#86868B] hover:text-[#1D1D1F]'
               }`}
             >
-              <span>🏷️</span>
-              <span>Kategori Produk ({categoryList.length}/5)</span>
+              <Tag className="w-3.5 h-3.5 shrink-0" />
+              <span>Kategori</span>
+              <span className="text-[11px] font-medium opacity-80">
+                ({categoryList.length}/5)
+              </span>
             </button>
           </div>
         </div>
 
         {/* Tab Content Body */}
-        <div className="p-5 overflow-y-auto flex-1 space-y-4">
+          {/* TAB 1: QRIS SETTINGS */}
+        <div className="p-5 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-1 space-y-4">
           {/* TAB 1: QRIS SETTINGS */}
           {activeTab === 'qris' && (
             <div className="space-y-4 text-left">
@@ -384,37 +401,54 @@ export default function StoreSettingsModal({
           {/* TAB 2: CATEGORY MANAGEMENT (MAX 5) */}
           {activeTab === 'categories' && (
             <div className="space-y-4 text-left">
-              {/* Limit Counter Banner */}
+              {/* Limit Counter Banner (Sejajar & Rapi di Mobile) */}
               <div
-                className={`p-3 rounded-2xl border flex items-center justify-between ${
+                className={`p-3.5 rounded-2xl border transition-all ${
                   categoryList.length >= 5
                     ? 'bg-amber-50/80 border-amber-200 text-amber-900'
                     : 'bg-black/[0.02] border-black/6 text-[#1D1D1F]'
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-base">{categoryList.length >= 5 ? '🔒' : '🏷️'}</span>
-                  <div>
-                    <span className="text-[13px] font-bold block">
-                      Jumlah Kategori: {categoryList.length} / 5
-                    </span>
-                    <span className="text-[11px] text-[#86868B]">
-                      {categoryList.length >= 5
-                        ? 'Batas maksimal 5 kategori telah tercapai.'
-                        : 'Maksimal 5 kategori agar tampilan POS tetap bersih.'}
-                    </span>
-                  </div>
-                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    {/* Wadah icon squircle ala iOS */}
+                    <div
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                        categoryList.length >= 5
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-[#0071E3]/10 text-[#0071E3]'
+                      }`}
+                    >
+                      {categoryList.length >= 5 ? (
+                        <Lock className="w-4 h-4" />
+                      ) : (
+                        <Tag className="w-4 h-4" />
+                      )}
+                    </div>
 
-                <span
-                  className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                    categoryList.length >= 5
-                      ? 'bg-amber-200 text-amber-800'
-                      : 'bg-[#34C759]/10 text-[#34C759]'
-                  }`}
-                >
-                  {categoryList.length >= 5 ? 'Penuh' : 'Tersedia'}
-                </span>
+                    <div className="min-w-0">
+                      <span className="text-[13px] font-bold block text-[#1D1D1F]">
+                        Jumlah Kategori: {categoryList.length} / 5
+                      </span>
+                      <p className="text-[11px] text-[#86868B] mt-0.5 leading-snug">
+                        {categoryList.length >= 5
+                          ? 'Batas maksimal 5 kategori telah tercapai.'
+                          : 'Maksimal 5 kategori agar tampilan POS tetap bersih.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Badge Status Sejajar di Pojok Kanan Atas */}
+                  <span
+                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full shrink-0 self-start mt-0.5 ${
+                      categoryList.length >= 5
+                        ? 'bg-amber-200 text-amber-800'
+                        : 'bg-[#34C759]/10 text-[#34C759]'
+                    }`}
+                  >
+                    {categoryList.length >= 5 ? 'Penuh' : 'Tersedia'}
+                  </span>
+                </div>
               </div>
 
               {categoryMessage.text && (
@@ -451,10 +485,12 @@ export default function StoreSettingsModal({
                     type="submit"
                     variant="primary"
                     size="md"
+                    className="px-3 sm:px-4 shrink-0"
                     disabled={categoryList.length >= 5 || !newCategoryName.trim() || isAddingCategory}
                     isLoading={isAddingCategory}
                   >
-                    + Tambah
+                    <Plus className="w-4 h-4 shrink-0" />
+                    <span className="hidden sm:inline">Tambah</span>
                   </Button>
                 </div>
               </form>
@@ -507,10 +543,7 @@ export default function StoreSettingsModal({
                             {deletingId === cat.id ? (
                               <span className="text-xs">Menghapus...</span>
                             ) : (
-                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M3 6h18" />
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                              </svg>
+                              <Trash className="w-4 h4"/>
                             )}
                           </button>
                         </div>
@@ -523,6 +556,57 @@ export default function StoreSettingsModal({
           )}
         </div>
       </div>
+
+      {/* Pop-up Peringatan Hapus Kategori Terakhir */}
+      {categoryToDelete && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div
+            className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-black/8 text-center space-y-4 animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Warning Icon Badge */}
+            <div className="w-12 h-12 rounded-full bg-[#FF9500]/15 text-[#FF9500] flex items-center justify-center mx-auto">
+              <TriangleAlert />
+            </div>
+
+            <div>
+              <h3 className="text-[17px] font-bold text-[#1D1D1F]">
+                Peringatan: Kategori Terakhir!
+              </h3>
+              <p className="text-[13px] text-[#86868B] mt-1.5 leading-relaxed">
+                Kategori <strong className="text-[#1D1D1F]">"{categoryToDelete.cat.name}"</strong> adalah satu-satunya kategori yang tersisa di toko Anda.
+              </p>
+              {categoryToDelete.count > 0 && (
+                <div className="mt-2.5 p-2.5 bg-[#FF9500]/10 border border-[#FF9500]/20 rounded-xl text-left text-[12px] text-[#B45309] font-medium leading-snug">
+                Ada {categoryToDelete.count} menu di kategori ini yang akan berubah status menjadi "Tanpa Kategori".
+                </div>
+              )}
+              <p className="text-[12px] text-[#86868B] mt-2">
+                Jika dihapus, toko Anda tidak akan memiliki kategori produk sama sekali.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setCategoryToDelete(null)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-black/10 font-semibold text-[13px] text-[#1D1D1F] hover:bg-black/5 transition-all cursor-pointer"
+                disabled={deletingId === categoryToDelete.cat.id}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => executeDeleteCategory(categoryToDelete.cat)}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF3B30] hover:bg-[#D70015] font-semibold text-[13px] text-white transition-all shadow-sm shadow-[#FF3B30]/20 cursor-pointer disabled:opacity-60"
+                disabled={deletingId === categoryToDelete.cat.id}
+              >
+                {deletingId === categoryToDelete.cat.id ? 'Menghapus...' : 'Tetap Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
