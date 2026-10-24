@@ -50,7 +50,7 @@ export default function TopSellingTable({ items = [] }) {
             5 produk teratas berdasarkan jumlah terjual
           </p>
         </div>
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071E3] bg-[#0071E3]/8 px-2.5 py-1 rounded-full">
+        <span className="text-center text-[11px] font-semibold uppercase tracking-wider text-[#0071E3] bg-[#0071E3]/8 px-2.5 py-1 rounded-full">
           Top 5
         </span>
       </div>

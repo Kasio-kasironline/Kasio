@@ -5,7 +5,7 @@ import MetricCards from '../features/analytics/MetricCards'
 import SalesBarChart from '../features/analytics/SalesBarChart'
 import TopSellingTable from '../features/analytics/TopSellingTable'
 import TransactionHistoryTable from '../features/analytics/TransactionHistoryTable'
-import { RotateCw, Zap, AlertTriangle, ArrowLeft } from 'lucide-react'
+import { RotateCw, Zap, AlertTriangle, ChevronLeft } from 'lucide-react'
 
 /**
  * AnalyticsPage component connected to Supabase PostgreSQL database.
@@ -86,10 +86,7 @@ export default function AnalyticsPage({ onNavigateToPos }) {
                 aria-label="Kembali ke Kasir"
                 className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#0071E3] hover:bg-[#0071E3]/10 px-2.5 sm:px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="m15 18-6-6 6-6" />
-                </svg>
-                {/* Sembunyikan teks di mobile agar judul tidak berhimpitan */}
+                <ChevronLeft className="w-4 h-4"/>
                 <span className="hidden sm:inline">Kembali ke Kasir</span>
               </button>
             )}

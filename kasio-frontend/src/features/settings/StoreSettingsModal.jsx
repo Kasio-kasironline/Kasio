@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import Button from '../../components/ui/Button'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../utils/imageCompressor'
-import { Settings, QrCode, Tag, Trash, Lock, TriangleAlert} from 'lucide-react'
+import { Settings, QrCode, Tag, Trash, Lock, TriangleAlert, Plus} from 'lucide-react'
 
 /**
  * StoreSettingsModal component:
@@ -249,22 +249,23 @@ export default function StoreSettingsModal({
         </div>
 
         {/* Apple-style Segmented Navigation Tabs */}
-        <div className="px-5 pt-3">
-          <div className="flex items-center p-1 bg-black/4 rounded-xl ">
+        <div className="px-4 sm:px-5 pt-3">
+          <div className="flex items-center p-1 bg-black/4 rounded-2xl gap-1">
             <button
               type="button"
               onClick={() => {
                 setActiveTab('qris')
                 setQrisMessage({ type: '', text: '' })
               }}
-              className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-2 text-[12px] sm:text-[13px] font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'qris'
                   ? 'bg-white text-[#1D1D1F] shadow-xs'
                   : 'text-[#86868B] hover:text-[#1D1D1F]'
               }`}
             >
-              <QrCode className="w-4 h-4" />
-              <span>QRIS Pembayaran</span>
+              <QrCode className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">QRIS Pembayaran</span>
+              <span className="sm:hidden">QRIS</span>
             </button>
 
             <button
@@ -273,14 +274,17 @@ export default function StoreSettingsModal({
                 setActiveTab('categories')
                 setCategoryMessage({ type: '', text: '' })
               }}
-              className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-2 text-[12px] sm:text-[13px] font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'categories'
                   ? 'bg-white text-[#1D1D1F] shadow-xs'
                   : 'text-[#86868B] hover:text-[#1D1D1F]'
               }`}
             >
-              <Tag className="w-4 h-4" />
-              <span>Kategori Produk ({categoryList.length}/5)</span>
+              <Tag className="w-3.5 h-3.5 shrink-0" />
+              <span>Kategori</span>
+              <span className="text-[11px] font-medium opacity-80">
+                ({categoryList.length}/5)
+              </span>
             </button>
           </div>
         </div>
@@ -397,41 +401,54 @@ export default function StoreSettingsModal({
           {/* TAB 2: CATEGORY MANAGEMENT (MAX 5) */}
           {activeTab === 'categories' && (
             <div className="space-y-4 text-left">
-              {/* Limit Counter Banner */}
+              {/* Limit Counter Banner (Sejajar & Rapi di Mobile) */}
               <div
-                className={`p-3 rounded-2xl border flex items-center justify-between ${
+                className={`p-3.5 rounded-2xl border transition-all ${
                   categoryList.length >= 5
                     ? 'bg-amber-50/80 border-amber-200 text-amber-900'
                     : 'bg-black/[0.02] border-black/6 text-[#1D1D1F]'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
-                  {categoryList.length >= 5 ? (
-                    <Lock className="w-4 h-4 text-amber-600 shrink-0" />
-                  ) : (
-                    <Tag className="w-4 h-4 text-[#0071E3] shrink-0" />
-                  )}
-                  <div>
-                    <span className="text-[13px] font-bold block">
-                      Jumlah Kategori: {categoryList.length} / 5
-                    </span>
-                    <span className="text-[11px] text-[#86868B]">
-                      {categoryList.length >= 5
-                        ? 'Batas maksimal 5 kategori telah tercapai.'
-                        : 'Maksimal 5 kategori agar tampilan POS tetap bersih.'}
-                    </span>
-                  </div>
-                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    {/* Wadah icon squircle ala iOS */}
+                    <div
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                        categoryList.length >= 5
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-[#0071E3]/10 text-[#0071E3]'
+                      }`}
+                    >
+                      {categoryList.length >= 5 ? (
+                        <Lock className="w-4 h-4" />
+                      ) : (
+                        <Tag className="w-4 h-4" />
+                      )}
+                    </div>
 
-                <span
-                  className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                    categoryList.length >= 5
-                      ? 'bg-amber-200 text-amber-800'
-                      : 'bg-[#34C759]/10 text-[#34C759]'
-                  }`}
-                >
-                  {categoryList.length >= 5 ? 'Penuh' : 'Tersedia'}
-                </span>
+                    <div className="min-w-0">
+                      <span className="text-[13px] font-bold block text-[#1D1D1F]">
+                        Jumlah Kategori: {categoryList.length} / 5
+                      </span>
+                      <p className="text-[11px] text-[#86868B] mt-0.5 leading-snug">
+                        {categoryList.length >= 5
+                          ? 'Batas maksimal 5 kategori telah tercapai.'
+                          : 'Maksimal 5 kategori agar tampilan POS tetap bersih.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Badge Status Sejajar di Pojok Kanan Atas */}
+                  <span
+                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full shrink-0 self-start mt-0.5 ${
+                      categoryList.length >= 5
+                        ? 'bg-amber-200 text-amber-800'
+                        : 'bg-[#34C759]/10 text-[#34C759]'
+                    }`}
+                  >
+                    {categoryList.length >= 5 ? 'Penuh' : 'Tersedia'}
+                  </span>
+                </div>
               </div>
 
               {categoryMessage.text && (
@@ -468,10 +485,12 @@ export default function StoreSettingsModal({
                     type="submit"
                     variant="primary"
                     size="md"
+                    className="px-3 sm:px-4 shrink-0"
                     disabled={categoryList.length >= 5 || !newCategoryName.trim() || isAddingCategory}
                     isLoading={isAddingCategory}
                   >
-                    + Tambah
+                    <Plus className="w-4 h-4 shrink-0" />
+                    <span className="hidden sm:inline">Tambah</span>
                   </Button>
                 </div>
               </form>

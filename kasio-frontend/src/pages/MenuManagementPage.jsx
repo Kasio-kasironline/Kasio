@@ -4,7 +4,7 @@ import AddMenuModal from '../features/products/AddMenuModal'
 import EditMenuModal from '../features/products/EditMenuModal'
 import StoreSettingsModal from '../features/settings/StoreSettingsModal'
 import { formatIDR, getInitials } from '../utils/formatters'
-import { SquarePen, Settings } from 'lucide-react'
+import { SquarePen, Settings, Plus, ChevronLeft } from 'lucide-react'
 
 /**
  * MenuManagementPage view: Dedicated screen for store owners to manage catalog.
@@ -62,9 +62,7 @@ export default function MenuManagementPage({
               aria-label="Kembali ke Kasir"
               className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#0071E3] hover:bg-[#0071E3]/10 px-2.5 sm:px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
+              <ChevronLeft className="w-4 h-4"/>
               <span className="hidden sm:inline">Kembali ke Kasir</span>
             </button>
 
@@ -133,10 +131,7 @@ export default function MenuManagementPage({
             onClick={() => setIsAddModalOpen(true)}
             className="self-start sm:self-auto inline-flex items-center gap-1.5 shadow-sm"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            <Plus className="w-4 h-4 shrink-0" />
             <span>Tambah Menu Baru</span>
           </Button>
         </div>
