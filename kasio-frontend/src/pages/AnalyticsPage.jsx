@@ -64,63 +64,66 @@ export default function AnalyticsPage({ onNavigateToPos }) {
     setRefreshKey((prev) => prev + 1)
   }
 
-  const periodOptions = [
-    { id: 'today', label: 'Hari Ini (24 Jam)' },
-    { id: 'week', label: '7 Hari Terakhir' },
-    { id: 'month', label: '30 Hari Terakhir' },
+    const periodOptions = [
+    { id: 'today', label: 'Hari Ini', fullLabel: 'Hari Ini (24 Jam)' },
+    { id: 'week', label: '7 Hari', fullLabel: '7 Hari Terakhir' },
+    { id: 'month', label: '30 Hari', fullLabel: '30 Hari Terakhir' },
   ]
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] text-[#1D1D1F] flex flex-col font-sans">
       {/* Top Navigation Bar (Apple HIG sticky frosted glass) */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/[0.06] px-4 sm:px-8 py-3.5 transition-all">
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/[0.06] px-3.5 sm:px-8 py-3 sm:py-3.5 transition-all">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Left: Back Button & Title */}
-          <div className="flex items-center gap-3">
+          {/* Baris 1: Tombol Kembali & Judul Analitik */}
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             {onNavigateToPos && (
               <button
-              type="button"
-              onClick={onNavigateToPos}
-              className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#0071E3] hover:bg-[#0071E3]/10 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-              <span>Kembali ke Kasir</span>
-            </button>
+                type="button"
+                onClick={onNavigateToPos}
+                title="Kembali ke Kasir"
+                aria-label="Kembali ke Kasir"
+                className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#0071E3] hover:bg-[#0071E3]/10 px-2.5 sm:px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+                {/* Sembunyikan teks di mobile agar judul tidak berhimpitan */}
+                <span className="hidden sm:inline">Kembali ke Kasir</span>
+              </button>
             )}
 
-            <div className="h-5 w-px bg-black/10 hidden sm:block" />
+            <div className="h-5 w-px bg-black/10 hidden sm:block shrink-0" />
 
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">📊</span>
-                <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-[#1D1D1F]">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-lg sm:text-xl shrink-0">📊</span>
+                <h1 className="text-[15px] sm:text-xl font-extrabold tracking-tight text-[#1D1D1F] truncate leading-tight">
                   Analitik & Laporan Penjualan
                 </h1>
               </div>
-              <p className="text-[11px] text-[#86868B]">
-                {business?.name || 'Kasio POS'} • Terhubung langsung dengan database transaksi
+              <p className="text-[11px] text-[#86868B] truncate mt-0.5">
+                {business?.name || 'Kasio POS'} • Terhubung ke database transaksi
               </p>
             </div>
           </div>
 
-          {/* Right: Controls (Refresh & Period Segmented Control) */}
-          <div className="flex items-center gap-2 self-start md:self-auto">
+          {/* Baris 2 (Mobile) / Sejajar Kanan (Desktop): Kontrol Segarkan & Filter Periode */}
+          <div className="flex items-center gap-2 w-full md:w-auto">
             {/* Tombol Segarkan Realtime */}
             <button
               type="button"
               onClick={handleRefresh}
               disabled={isLoading}
               title="Segarkan data transaksi terbaru"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/10 active:scale-95 rounded-xl transition-all cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center justify-center p-2 sm:px-3 sm:py-1.5 text-[12px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/10 active:scale-95 rounded-xl transition-all cursor-pointer disabled:opacity-50 shrink-0"
             >
               <span className={isLoading ? 'animate-spin' : ''}>🔄</span>
-              <span className="hidden sm:inline">Segarkan</span>
+              <span className="hidden sm:inline ml-1.5">Segarkan</span>
             </button>
 
-            {/* Apple-style Period Segmented Control */}
-            <div className="flex items-center bg-black/5 p-1 rounded-2xl">
+            {/* Segmented Control Periode Responsif */}
+            <div className="flex items-center bg-black/5 p-1 rounded-2xl flex-1 md:flex-initial">
               {periodOptions.map((opt) => {
                 const isActive = period === opt.id
                 return (
@@ -128,13 +131,15 @@ export default function AnalyticsPage({ onNavigateToPos }) {
                     key={opt.id}
                     type="button"
                     onClick={() => setPeriod(opt.id)}
-                    className={`px-3.5 py-1.5 rounded-xl text-[12px] font-semibold transition-all cursor-pointer ${
+                    className={`flex-1 md:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[12px] font-semibold transition-all cursor-pointer whitespace-nowrap text-center ${
                       isActive
                         ? 'bg-white text-[#1D1D1F] shadow-sm'
                         : 'text-[#86868B] hover:text-[#1D1D1F]'
                     }`}
                   >
-                    {opt.label}
+                    {/* Di mobile label ringkas, di desktop label penuh */}
+                    <span className="sm:hidden">{opt.label}</span>
+                    <span className="hidden sm:inline">{opt.fullLabel}</span>
                   </button>
                 )
               })}

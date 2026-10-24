@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef} from 'react'
 import { CATEGORIES, DUMMY_MENU_ITEMS } from '../data/dummyMenu'
 import MenuCard from '../features/pos/MenuCard'
 import CartPanel from '../features/pos/CartPanel'
@@ -76,6 +76,58 @@ export default function PosPage({
   const handleClearCart = () => {
     setCart([])
   }
+
+  // Kunci scroll background saat menu mobile atau keranjang mobile terbuka
+  useEffect(() => {
+    if (isMobileMenuOpen || isMobileCartOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isMobileMenuOpen, isMobileCartOpen])
+
+  // Swipe gesture untuk menutup keranjang mobile
+  const [dragOffsetY, setDragOffsetY] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const touchStartY = useRef(0)
+
+  const handleTouchStart = (e) => {
+    touchStartY.current = e.touches[0].clientY
+    setIsDragging(true)
+  }
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return
+    const currentY = e.touches[0].clientY
+    const deltaY = currentY - touchStartY.current
+    // Hanya izinkan tarikan ke bawah (deltaY positif)
+    if (deltaY > 0) {
+      setDragOffsetY(deltaY)
+    }
+  }
+
+  const handleTouchEnd = () => {
+    setIsDragging(false)
+    // Jika ditarik lebih dari 90px, tutup keranjang
+    if (dragOffsetY > 90) {
+      setIsMobileCartOpen(false)
+      setDragOffsetY(0)
+    } else {
+      // Jika kurang dari 90px, kembalikan ke posisi semula secara halus
+      setDragOffsetY(0)
+    }
+  }
+
+  // Reset offset saat keranjang ditutup
+  useEffect(() => {
+    if (!isMobileCartOpen) {
+      setDragOffsetY(0)
+      setIsDragging(false)
+    }
+  }, [isMobileCartOpen])
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
   const grandTotal = cart.reduce(
@@ -206,74 +258,77 @@ export default function PosPage({
               </button>
             )}
           </div>
-
-          {/* Mobile Dropdown Menu Popover (< md) */}
-          {isMobileMenuOpen && (
-            <>
-              {/* Backdrop klik luar untuk menutup dropdown */}
-              <div
-                className="fixed inset-0 z-40 bg-black/20 backdrop-blur-xs md:hidden"
-                onClick={() => setIsMobileMenuOpen(false)}
-              />
-
-              <div className="absolute right-4 top-13 z-50 md:hidden w-52 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-xl border border-black/8 p-1.5 flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150">
-                {onNavigateToAnalytics && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false)
-                      onNavigateToAnalytics()
-                    }}
-                    className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-[13px] font-semibold text-[#1D1D1F] hover:bg-black/5 active:bg-black/10 transition-colors text-left"
-                  >
-                    <span className="text-base">📊</span>
-                    <span>Analitik & Laporan</span>
-                  </button>
-                )}
-
-                {onNavigateToMenuManagement && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false)
-                      onNavigateToMenuManagement()
-                    }}
-                    className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-[13px] font-semibold text-[#1D1D1F] hover:bg-black/5 active:bg-black/10 transition-colors text-left"
-                  >
-                    <svg className="w-4 h-4 text-[#86868B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                    <span>Kelola Menu</span>
-                  </button>
-                )}
-
-                {onLogout && (
-                  <>
-                    <div className="h-px bg-black/6 my-1" />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false)
-                        onLogout()
-                      }}
-                      className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-[13px] font-semibold text-[#FF3B30] hover:bg-[#FF3B30]/10 transition-colors text-left"
-                    >
-                      <svg className="w-4 h-4 text-[#FF3B30]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
-                      </svg>
-                      <span>Keluar Akun</span>
-                    </button>
-                  </>
-                )}
-              </div>
-            </>
-          )}
-
         </div>
       </header>
+
+      {/* Mobile Dropdown Popover (Full Screen Dim Backdrop) */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Dim Hitam 1 Layar Penuh (Klik area luar untuk langsung menutup dan kembali ke POS) */}
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+
+          {/* Kartu Dropdown Menu */}
+          <div
+            className="absolute right-4 top-14 z-10 w-56 bg-white rounded-3xl shadow-2xl border border-black/8 p-1.5 flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {onNavigateToAnalytics && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false)
+                  onNavigateToAnalytics()
+                }}
+                className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl text-[14px] font-semibold text-[#1D1D1F] hover:bg-black/5 active:bg-black/10 transition-colors text-left cursor-pointer"
+              >
+                <span className="text-lg">📊</span>
+                <span>Analitik & Laporan</span>
+              </button>
+            )}
+
+            {onNavigateToMenuManagement && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false)
+                  onNavigateToMenuManagement()
+                }}
+                className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl text-[14px] font-semibold text-[#1D1D1F] hover:bg-black/5 active:bg-black/10 transition-colors text-left cursor-pointer"
+              >
+                <svg className="w-5 h-5 text-[#86868B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <span>Kelola Menu</span>
+              </button>
+            )}
+
+            {onLogout && (
+              <>
+                <div className="h-px bg-black/6 my-1" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false)
+                    onLogout()
+                  }}
+                  className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl text-[14px] font-semibold text-[#FF3B30] hover:bg-[#FF3B30]/10 active:bg-[#FF3B30]/15 transition-colors text-left cursor-pointer"
+                >
+                  <svg className="w-5 h-5 text-[#FF3B30]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                  <span>Keluar Akun</span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col md:flex-row gap-6 items-start">
@@ -360,25 +415,44 @@ export default function PosPage({
         </div>
       )}
 
-      {/* Mobile Cart Sheet / Modal Drawer */}
+            {/* Mobile Cart Sheet / Modal Drawer (dengan dukungan swipe down) */}
       {isMobileCartOpen && (
         <div className="md:hidden fixed inset-0 z-40 flex flex-col justify-end">
+          {/* Latar Belakang Redup */}
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity animate-fade-in"
             onClick={() => setIsMobileCartOpen(false)}
           />
-          <div className="relative bg-white rounded-t-3xl p-4 shadow-2xl max-h-[85vh] flex flex-col z-50">
-            <div className="w-12 h-1.5 bg-black/10 rounded-full mx-auto mb-3" />
-            <div className="flex items-center justify-between pb-3 border-b border-black/6">
-              <h3 className="font-bold text-base">Keranjang Pesanan</h3>
-              <button
-                type="button"
-                onClick={() => setIsMobileCartOpen(false)}
-                className="text-xs font-semibold text-[#86868B] p-1"
-              >
-                Tutup
-              </button>
+
+          {/* Kartu Keranjang Bottom Sheet */}
+          <div
+            className="relative bg-white rounded-t-3xl p-4 shadow-2xl max-h-[85vh] flex flex-col z-50 animate-in slide-in-from-bottom duration-200"
+            style={{
+              transform: `translateY(${dragOffsetY}px)`,
+              transition: isDragging ? 'none' : 'transform 0.25s cubic-bezier(0.32, 0.72, 0, 1)',
+            }}
+          >
+            {/* Area Handle Swipe (Geser ke bawah untuk menutup) */}
+            <div
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="touch-none select-none pt-1 pb-2 cursor-grab active:cursor-grabbing"
+            >
+              <div className="w-12 h-1.5 bg-black/15 hover:bg-black/25 active:bg-black/35 rounded-full mx-auto mb-2 transition-colors" />
+              <div className="flex items-center justify-between pb-2 border-b border-black/6">
+                <h3 className="font-bold text-base text-[#1D1D1F]">Keranjang Pesanan</h3>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileCartOpen(false)}
+                  className="text-xs font-semibold text-[#86868B] hover:text-[#1D1D1F] p-1 cursor-pointer"
+                >
+                  Tutup
+                </button>
+              </div>
             </div>
+
+            {/* Konten Daftar Item Keranjang */}
             <div className="overflow-y-auto flex-1 py-2">
               <CartPanel
                 cart={cart}
