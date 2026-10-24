@@ -296,7 +296,7 @@ function AppContent() {
     try {
       const category = await getOrCreateCategory(updatedItem.category)
 
-      const { data, error } = await supabase
+            const { data, error } = await supabase
         .from('menu_items')
         .update({
           category_id: category.id,
@@ -304,6 +304,7 @@ function AppContent() {
           description: updatedItem.description || null,
           price: Number(updatedItem.price),
           image_url: updatedItem.image || null,
+          is_available: updatedItem.isAvailable !== undefined ? updatedItem.isAvailable : true, // 👈 Tambahkan baris ini
           updated_at: new Date().toISOString(),
         })
         .eq('id', updatedItem.id)
