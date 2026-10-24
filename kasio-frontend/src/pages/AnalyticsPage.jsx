@@ -5,6 +5,7 @@ import MetricCards from '../features/analytics/MetricCards'
 import SalesBarChart from '../features/analytics/SalesBarChart'
 import TopSellingTable from '../features/analytics/TopSellingTable'
 import TransactionHistoryTable from '../features/analytics/TransactionHistoryTable'
+import { RotateCw, Zap, AlertTriangle, ArrowLeft } from 'lucide-react'
 
 /**
  * AnalyticsPage component connected to Supabase PostgreSQL database.
@@ -96,8 +97,7 @@ export default function AnalyticsPage({ onNavigateToPos }) {
             <div className="h-5 w-px bg-black/10 hidden sm:block shrink-0" />
 
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="text-lg sm:text-xl shrink-0">📊</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 pt-3">
                 <h1 className="text-[15px] sm:text-xl font-extrabold tracking-tight text-[#1D1D1F] truncate leading-tight">
                   Analitik & Laporan Penjualan
                 </h1>
@@ -118,7 +118,7 @@ export default function AnalyticsPage({ onNavigateToPos }) {
               title="Segarkan data transaksi terbaru"
               className="inline-flex items-center justify-center p-2 sm:px-3 sm:py-1.5 text-[12px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/10 active:scale-95 rounded-xl transition-all cursor-pointer disabled:opacity-50 shrink-0"
             >
-              <span className={isLoading ? 'animate-spin' : ''}>🔄</span>
+              <RotateCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline ml-1.5">Segarkan</span>
             </button>
 
@@ -171,7 +171,7 @@ export default function AnalyticsPage({ onNavigateToPos }) {
 
         {/* Realtime Sync Callout */}
         <div className="bg-gradient-to-r from-[#0071E3]/5 to-transparent border border-[#0071E3]/15 rounded-2xl p-4 flex items-start gap-3 text-left">
-          <span className="text-xl shrink-0">⚡</span>
+          <Zap className="w-5 h-5 text-[#0071E3] shrink-0 fill-[#0071E3]/20" />
           <div className="text-[12px] text-[#1D1D1F] leading-relaxed">
             <strong className="font-semibold text-[#0071E3]">
               Sinkronisasi Otomatis Kasir:

@@ -4,6 +4,7 @@ import AddMenuModal from '../features/products/AddMenuModal'
 import EditMenuModal from '../features/products/EditMenuModal'
 import StoreSettingsModal from '../features/settings/StoreSettingsModal'
 import { formatIDR, getInitials } from '../utils/formatters'
+import { SquarePen, Settings } from 'lucide-react'
 
 /**
  * MenuManagementPage view: Dedicated screen for store owners to manage catalog.
@@ -88,10 +89,7 @@ export default function MenuManagementPage({
               aria-label="Pengaturan Tambahan"
               className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/8 active:scale-95 px-2.5 sm:px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0"
             >
-              <svg className="w-4 h-4 text-[#86868B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
+              <Settings className="w-4 h-4"/>
               <span className="hidden sm:inline">Pengaturan Tambahan</span>
             </button>
           </div>
@@ -288,16 +286,7 @@ export default function MenuManagementPage({
                     className="inline-flex items-center gap-1.5 text-[12px] sm:text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/10 active:bg-black/15 px-3 py-1.5 rounded-xl transition-all active:scale-95 cursor-pointer"
                     title="Edit rincian, stok, atau hapus menu"
                   >
-                    <svg
-                      className="w-3.5 h-3.5 text-[#86868B]"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M12 20h9" />
-                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                    </svg>
+                    <SquarePen className="w-4 h-4"/>
                     <span>Edit Menu</span>
                   </button>
                 </div>

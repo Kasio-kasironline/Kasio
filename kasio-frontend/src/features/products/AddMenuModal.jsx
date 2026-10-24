@@ -4,6 +4,7 @@ import Button from '../../components/ui/Button'
 import { getInitials } from '../../utils/formatters'
 import { compressImage } from '../../utils/imageCompressor'
 import { supabase } from '../../lib/supabase'
+import { Camera } from 'lucide-react'
 
 export default function AddMenuModal({
   isOpen,
@@ -294,10 +295,7 @@ export default function AddMenuModal({
                     htmlFor="menu-photo-input"
                     className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#1D1D1F] bg-white hover:bg-neutral-50 border border-black/10 px-3 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer active:scale-95"
                   >
-                    <svg className="w-4 h-4 text-[#0071E3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                      <circle cx="12" cy="13" r="4" />
-                    </svg>
+                    <Camera className="text-[#0071E3] w-4 h-4"/>
                     <span>Pilih Foto</span>
                   </label>
 
@@ -474,7 +472,7 @@ export default function AddMenuModal({
           <div className="pt-3 flex items-center justify-end gap-2.5 border-t border-black/6">
             <Button
               type="button"
-              variant="destructive"
+              variant="secondary"
               size="md"
               onClick={onClose}
               disabled={isSaving}

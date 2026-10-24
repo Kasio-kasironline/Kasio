@@ -17,3 +17,13 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* Sembunyikan scrollbar bawaan browser (Desktop & Mobile) tapi fungsi scroll tetap aktif */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE dan Edge */
+  scrollbar-width: none; /* Firefox & Chrome Modern */
+}

@@ -42,7 +42,6 @@ export default function TopSellingTable({ items = [] }) {
       <div className="flex items-center justify-between pb-4 border-b border-black/[0.04]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-base">🔥</span>
             <h3 className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight">
               Menu Terlaris
             </h3>

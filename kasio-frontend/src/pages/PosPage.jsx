@@ -4,6 +4,7 @@ import MenuCard from '../features/pos/MenuCard'
 import CartPanel from '../features/pos/CartPanel'
 import PaymentModal from '../features/pos/PaymentModal'
 import { formatIDR } from '../utils/formatters'
+import { BarChart3, SlidersHorizontal, LogOut } from 'lucide-react'
 
 /**
  * PosPage view: the core cashier Point-of-Sale screen.
@@ -225,7 +226,7 @@ export default function PosPage({
                 onClick={onNavigateToAnalytics}
                 className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/8 active:scale-95 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
               >
-                <span>📊</span>
+                <BarChart3 className="w-4 h-4 text-[#0071E3]" />
                 <span>Analitik</span>
               </button>
             )}
@@ -284,7 +285,7 @@ export default function PosPage({
                 }}
                 className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl text-[14px] font-semibold text-[#1D1D1F] hover:bg-black/5 active:bg-black/10 transition-colors text-left cursor-pointer"
               >
-                <span className="text-lg">📊</span>
+                <BarChart3 className="w-4 h-4 text-[#0071E3]" />
                 <span>Analitik & Laporan</span>
               </button>
             )}
@@ -298,10 +299,7 @@ export default function PosPage({
                 }}
                 className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl text-[14px] font-semibold text-[#1D1D1F] hover:bg-black/5 active:bg-black/10 transition-colors text-left cursor-pointer"
               >
-                <svg className="w-5 h-5 text-[#86868B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
+                <SlidersHorizontal className="w-4 h-4 text-[#86868B]" />
                 <span>Kelola Menu</span>
               </button>
             )}
@@ -317,11 +315,7 @@ export default function PosPage({
                   }}
                   className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl text-[14px] font-semibold text-[#FF3B30] hover:bg-[#FF3B30]/10 active:bg-[#FF3B30]/15 transition-colors text-left cursor-pointer"
                 >
-                  <svg className="w-5 h-5 text-[#FF3B30]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                  </svg>
+                  <LogOut className="w-4 h-4 text-[#FF3B30]" />
                   <span>Keluar Akun</span>
                 </button>
               </>
