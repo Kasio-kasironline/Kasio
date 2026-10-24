@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import Button from '../../components/ui/Button'
 import { supabase } from '../../lib/supabase'
+import { compressImage } from '../../utils/imageCompressor'
 
 /**
  * StoreSettingsModal component:
@@ -37,7 +38,7 @@ export default function StoreSettingsModal({
   if (!isOpen) return null
 
   // --- Handlers for QRIS ---
-  const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -46,19 +47,28 @@ export default function StoreSettingsModal({
       return
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      setQrisMessage({ type: 'error', text: 'Ukuran file maksimal 2 MB.' })
+    // Mendukung ukuran file awal hingga 5 MB
+    if (file.size > 5 * 1024 * 1024) {
+      setQrisMessage({ type: 'error', text: 'Ukuran file maksimal 5 MB.' })
       return
     }
 
-    setSelectedFile(file)
-    setQrisMessage({ type: '', text: '' })
+    try {
+      setQrisMessage({ type: '', text: '' })
 
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      setQrisPreview(event.target?.result)
+      // Kompres QRIS ke maksimal 800x800 px dengan kualitas 85% agar barcode tetap sangat tajam
+      const { file: compressedFile, dataUrl } = await compressImage(file, {
+        maxWidth: 800,
+        maxHeight: 800,
+        quality: 0.85,
+      })
+
+      setSelectedFile(compressedFile)
+      setQrisPreview(dataUrl)
+    } catch (err) {
+      console.error('Gagal mengompresi QRIS:', err)
+      setQrisMessage({ type: 'error', text: 'Gagal memproses gambar QRIS.' })
     }
-    reader.readAsDataURL(file)
   }
 
   const handleSaveQris = async () => {

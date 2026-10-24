@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { getInitials } from '../../utils/formatters'
+import { compressImage } from '../../utils/imageCompressor'
 import { supabase } from '../../lib/supabase'
 
 export default function AddMenuModal({
@@ -55,7 +56,7 @@ export default function AddMenuModal({
 
   if (!isOpen) return null
 
-  const handleImageFileChange = (e) => {
+    const handleImageFileChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -64,19 +65,28 @@ export default function AddMenuModal({
       return
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      setErrors((prev) => ({ ...prev, image: 'Ukuran foto maksimal 2 MB.' }))
+    // Mendukung ukuran kamera HP hingga 5 MB
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, image: 'Ukuran foto maksimal 5 MB.' }))
       return
     }
 
-    setErrors((prev) => ({ ...prev, image: '' }))
-    setImageFile(file)
+    try {
+      setErrors((prev) => ({ ...prev, image: '' }))
 
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      setImagePreview(event.target?.result || '')
+      // Kompres otomatis ke maksimal 600x600 px (menyusut ke ~40-70 KB)
+      const { file: compressedFile, dataUrl } = await compressImage(file, {
+        maxWidth: 600,
+        maxHeight: 600,
+        quality: 0.8,
+      })
+
+      setImageFile(compressedFile)
+      setImagePreview(dataUrl)
+    } catch (err) {
+      console.error('Gagal mengompresi gambar:', err)
+      setErrors((prev) => ({ ...prev, image: 'Gagal memproses gambar.' }))
     }
-    reader.readAsDataURL(file)
   }
 
   const validate = () => {
