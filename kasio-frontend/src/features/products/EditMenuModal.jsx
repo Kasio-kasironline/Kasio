@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from 'react'
-import Input from '../../components/ui/Input'
+import { Camera, Trash } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import Button from '../../components/ui/Button'
+import Input from '../../components/ui/Input'
+import { supabase } from '../../lib/supabase'
 import { getInitials } from '../../utils/formatters'
 import { compressImage } from '../../utils/imageCompressor'
-import { supabase } from '../../lib/supabase'
-import { Trash, Camera } from 'lucide-react'
 
 /**
  * EditMenuModal component:
@@ -253,7 +253,7 @@ export default function EditMenuModal({
               type="button"
               onClick={onClose}
               disabled={isSaving || isDeleting}
-              className="w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-[#86868B] hover:text-[#1D1D1F] transition-all cursor-pointer disabled:opacity-50"
+              className="w-8 h-8 shrink-0 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-[#86868B] hover:text-[#1D1D1F] transition-all cursor-pointer disabled:opacity-50"
             >
               ✕
             </button>
@@ -357,16 +357,14 @@ export default function EditMenuModal({
               <button
                 type="button"
                 onClick={() => setIsAvailable(!isAvailable)}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  isAvailable ? 'bg-[#34C759]' : 'bg-[#D1D1D6]'
-                }`}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAvailable ? 'bg-[#34C759]' : 'bg-[#D1D1D6]'
+                  }`}
                 role="switch"
                 aria-checked={isAvailable}
               >
                 <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                    isAvailable ? 'translate-x-5' : 'translate-x-0'
-                  }`}
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${isAvailable ? 'translate-x-5' : 'translate-x-0'
+                    }`}
                 />
               </button>
             </div>
@@ -415,12 +413,12 @@ export default function EditMenuModal({
                 {/* Box Preview: Foto atau Inisial */}
                 <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white border border-black/8 shadow-xs flex items-center justify-center overflow-hidden shrink-0 relative">
                   {imagePreview &&
-                  (imagePreview.startsWith('http') ||
-                    imagePreview.startsWith('data:')) ? (
+                    (imagePreview.startsWith('http') ||
+                      imagePreview.startsWith('data:')) ? (
                     <img
                       src={imagePreview}
                       alt="Preview Menu"
-                      className="w-full h-full object-cover"
+                      className="block w-full h-auto object-contain"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-[#0071E3]/10 to-[#0071E3]/25 border border-[#0071E3]/15 flex flex-col items-center justify-center text-[#0071E3] select-none p-1">
@@ -450,7 +448,7 @@ export default function EditMenuModal({
                       htmlFor="edit-menu-photo-input"
                       className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#1D1D1F] bg-white hover:bg-neutral-50 border border-black/10 px-3 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer active:scale-95"
                     >
-                      <Camera className="text-[#0071E3] w-4 h-4"/>
+                      <Camera className="text-[#0071E3] w-4 h-4" />
                       <span>Ganti Foto</span>
                     </label>
 
@@ -504,7 +502,7 @@ export default function EditMenuModal({
                 disabled={isSaving || isDeleting}
                 className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#FF3B30] hover:text-[#D70015] hover:bg-[#FF3B30]/10 px-3 py-2 rounded-xl transition-all active:scale-95 cursor-pointer disabled:opacity-50"
               >
-                <Trash className="w-4 h-4"/>
+                <Trash className="w-4 h-4" />
                 <span>Hapus Menu</span>
               </button>
 
@@ -531,7 +529,7 @@ export default function EditMenuModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-12 h-12 rounded-full bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center mx-auto">
-              <Trash className="w-4 h-4"/>
+              <Trash className="w-4 h-4" />
             </div>
 
             <div>
