@@ -73,13 +73,13 @@ kasio/
 
 ## 🗺️ Roadmap
 
-- [ ] Authentication and business onboarding
-- [ ] Product and category management
-- [ ] POS cart and checkout
-- [ ] Cash and manual QRIS payments
-- [ ] Transaction history and receipts
-- [ ] Sales analytics dashboard
-- [ ] Responsive UI improvements
+- ✅ Authentication and business onboarding
+- ✅ Product and category management
+- ✅ POS cart and checkout
+- ✅ Cash and manual QRIS payments
+- ✅ Transaction history and receipts
+- ✅ Sales analytics dashboard
+- ✅ Responsive UI improvements
 - [ ] Automated payment gateway integration
 - [ ] Additional business management features
 
