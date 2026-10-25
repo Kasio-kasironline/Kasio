@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { formatIDR } from '../../utils/formatters'
+import { Search, QrCode, Banknote, Receipt, X } from 'lucide-react'
 
 /**
  * TransactionHistoryTable component.
@@ -58,7 +59,6 @@ export default function TransactionHistoryTable({ transactions = [], period = 't
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-black/[0.04]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-base">📋</span>
             <h3 className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight">
               Riwayat Transaksi Penjualan
             </h3>
@@ -100,9 +100,7 @@ export default function TransactionHistoryTable({ transactions = [], period = 't
               placeholder="Cari no. invoice / menu..."
               className="w-full sm:w-56 pl-8 pr-7 py-1.5 bg-black/4 hover:bg-black/6 focus:bg-white rounded-xl border border-transparent focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 text-[12px] text-[#1D1D1F] placeholder-[#86868B] transition-all outline-none"
             />
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#86868B]">
-              🔍
-            </span>
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#86868B] pointer-events-none" />
             {searchQuery && (
               <button
                 type="button"
@@ -171,7 +169,7 @@ export default function TransactionHistoryTable({ transactions = [], period = 't
                             : 'bg-[#34C759]/10 text-[#34C759]'
                         }`}
                       >
-                        <span>{isQRIS ? '📱' : '💵'}</span>
+                        {isQRIS ? <QrCode className="w-3 h-3" /> : <Banknote className="w-3 h-3" />}
                         <span>{tx.paymentMethod}</span>
                       </span>
                     </td>
@@ -233,7 +231,7 @@ export default function TransactionHistoryTable({ transactions = [], period = 't
                         : 'bg-[#34C759]/10 text-[#34C759]'
                     }`}
                   >
-                    <span>{isQRIS ? '📱' : '💵'}</span>
+                    {isQRIS ? <QrCode className="w-3 h-3" /> : <Banknote className="w-3 h-3" />}
                     <span>{tx.paymentMethod}</span>
                   </span>
 
@@ -271,7 +269,6 @@ export default function TransactionHistoryTable({ transactions = [], period = 't
 
             {/* Receipt Header */}
             <div className="text-center pb-4 border-b border-dashed border-black/15">
-              <span className="text-2xl">☕</span>
               <h4 className="text-base font-extrabold text-[#1D1D1F] tracking-tight mt-1">
                 Kasio POS
               </h4>

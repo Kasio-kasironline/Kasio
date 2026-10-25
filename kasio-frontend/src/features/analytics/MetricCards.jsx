@@ -37,9 +37,6 @@ export default function MetricCards({ data }) {
           <span className="text-[12px] font-semibold uppercase tracking-wider text-[#86868B]">
             Total Omzet
           </span>
-          <div className="w-8 h-8 rounded-xl bg-[#34C759]/10 text-[#34C759] flex items-center justify-center font-bold text-sm">
-            💰
-          </div>
         </div>
         <div className="mt-3">
           <h3 className="text-2xl sm:text-[26px] font-extrabold text-[#1D1D1F] tracking-tight leading-tight">
@@ -57,9 +54,6 @@ export default function MetricCards({ data }) {
           <span className="text-[12px] font-semibold uppercase tracking-wider text-[#86868B]">
             Total Transaksi
           </span>
-          <div className="w-8 h-8 rounded-xl bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center font-bold text-sm">
-            🧾
-          </div>
         </div>
         <div className="mt-3">
           <h3 className="text-2xl sm:text-[26px] font-extrabold text-[#1D1D1F] tracking-tight leading-tight">
@@ -77,9 +71,6 @@ export default function MetricCards({ data }) {
           <span className="text-[12px] font-semibold uppercase tracking-wider text-[#86868B]">
             Rata-rata Order (AOV)
           </span>
-          <div className="w-8 h-8 rounded-xl bg-[#FF9500]/10 text-[#FF9500] flex items-center justify-center font-bold text-sm">
-            📊
-          </div>
         </div>
         <div className="mt-3">
           <h3 className="text-2xl sm:text-[26px] font-extrabold text-[#1D1D1F] tracking-tight leading-tight">
@@ -97,9 +88,6 @@ export default function MetricCards({ data }) {
           <span className="text-[12px] font-semibold uppercase tracking-wider text-[#86868B]">
             Metode Bayar
           </span>
-          <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-sm">
-            📱
-          </div>
         </div>
         <div className="mt-3 space-y-2">
           {/* Progress bar split */}

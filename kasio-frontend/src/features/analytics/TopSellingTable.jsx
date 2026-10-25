@@ -42,7 +42,6 @@ export default function TopSellingTable({ items = [] }) {
       <div className="flex items-center justify-between pb-4 border-b border-black/[0.04]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-base">🔥</span>
             <h3 className="text-base sm:text-lg font-bold text-[#1D1D1F] tracking-tight">
               Menu Terlaris
             </h3>
@@ -51,7 +50,7 @@ export default function TopSellingTable({ items = [] }) {
             5 produk teratas berdasarkan jumlah terjual
           </p>
         </div>
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071E3] bg-[#0071E3]/8 px-2.5 py-1 rounded-full">
+        <span className="text-center text-[11px] font-semibold uppercase tracking-wider text-[#0071E3] bg-[#0071E3]/8 px-2.5 py-1 rounded-full">
           Top 5
         </span>
       </div>

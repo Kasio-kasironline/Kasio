@@ -2,7 +2,9 @@ import { useEffect, useState, useRef } from 'react'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { getInitials } from '../../utils/formatters'
+import { compressImage } from '../../utils/imageCompressor'
 import { supabase } from '../../lib/supabase'
+import { Camera, ChevronDown, Check } from 'lucide-react'
 
 export default function AddMenuModal({
   isOpen,
@@ -22,7 +24,24 @@ export default function AddMenuModal({
   const [showUrlInput, setShowUrlInput] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState({})
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
+  const categoryDropdownRef = useRef(null)
   const fileInputRef = useRef(null)
+
+  // Tutup dropdown otomatis saat klik di luar
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(e.target)) {
+        setIsCategoryDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
+  }, [])
 
   // Sesuaikan kategori awal jika data kategori baru selesai dimuat.
   useEffect(() => {
@@ -55,7 +74,7 @@ export default function AddMenuModal({
 
   if (!isOpen) return null
 
-  const handleImageFileChange = (e) => {
+    const handleImageFileChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -64,19 +83,28 @@ export default function AddMenuModal({
       return
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      setErrors((prev) => ({ ...prev, image: 'Ukuran foto maksimal 2 MB.' }))
+    // Mendukung ukuran kamera HP hingga 5 MB
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, image: 'Ukuran foto maksimal 5 MB.' }))
       return
     }
 
-    setErrors((prev) => ({ ...prev, image: '' }))
-    setImageFile(file)
+    try {
+      setErrors((prev) => ({ ...prev, image: '' }))
 
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      setImagePreview(event.target?.result || '')
+      // Kompres otomatis ke maksimal 600x600 px (menyusut ke ~40-70 KB)
+      const { file: compressedFile, dataUrl } = await compressImage(file, {
+        maxWidth: 600,
+        maxHeight: 600,
+        quality: 0.8,
+      })
+
+      setImageFile(compressedFile)
+      setImagePreview(dataUrl)
+    } catch (err) {
+      console.error('Gagal mengompresi gambar:', err)
+      setErrors((prev) => ({ ...prev, image: 'Gagal memproses gambar.' }))
     }
-    reader.readAsDataURL(file)
   }
 
   const validate = () => {
@@ -223,7 +251,7 @@ export default function AddMenuModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4 overflow-y-auto flex-1 pr-1">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-1">
           {/* Foto Menu & Inisial Placeholder */}
           <div className="flex flex-col gap-2 text-left">
             <div className="flex items-center justify-between">
@@ -284,10 +312,7 @@ export default function AddMenuModal({
                     htmlFor="menu-photo-input"
                     className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#1D1D1F] bg-white hover:bg-neutral-50 border border-black/10 px-3 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer active:scale-95"
                   >
-                    <svg className="w-4 h-4 text-[#0071E3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                      <circle cx="12" cy="13" r="4" />
-                    </svg>
+                    <Camera className="text-[#0071E3] w-4 h-4"/>
                     <span>Pilih Foto</span>
                   </label>
 
@@ -346,44 +371,85 @@ export default function AddMenuModal({
 
           {/* Kategori dan Harga */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <div className="flex flex-col gap-1.5 text-left">
-              <label
-                htmlFor="menu-category"
-                className="text-[13px] font-medium text-[#1D1D1F]"
-              >
+            <div className="flex flex-col gap-1.5 text-left relative" ref={categoryDropdownRef}>
+              <label className="text-[13px] font-medium text-[#1D1D1F]">
                 Kategori <span className="text-[#FF3B30]">*</span>
               </label>
 
-              <select
-                id="menu-category"
-                value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value)
-                  setErrors((prev) => ({
-                    ...prev,
-                    category: '',
-                    submit: '',
-                  }))
-                }}
-                className="w-full py-2.5 px-3.5 text-[15px] text-[#1D1D1F] bg-white rounded-xl border border-black/12 hover:border-black/24 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/15 transition-all"
+              {/* Tombol Pemicu Dropdown */}
+              <button
+                type="button"
+                onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                className={`w-full py-2.5 px-3.5 text-[14px] text-[#1D1D1F] bg-white rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
+                  isCategoryDropdownOpen
+                    ? 'border-[#0071E3] ring-4 ring-[#0071E3]/15'
+                    : 'border-black/12 hover:border-black/24'
+                }`}
               >
-                {categories
-                  .filter((item) => item !== 'Semua')
-                  .map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
+                <span className="truncate font-medium">
+                  {category === 'new' ? '+ Kategori Baru' : category || 'Pilih Kategori'}
+                </span>
+                <ChevronDown
+                  className={`w-4 h-4 text-[#86868B] transition-transform duration-200 shrink-0 ${
+                    isCategoryDropdownOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
 
-                {categories.filter((item) => item !== 'Semua').length < 5 && (
-                  <option value="new">+ Kategori Baru...</option>
-                )}
-              </select>
+              {/* Popover Menu Dropdown (Terkunci presisi di dalam modal) */}
+              {isCategoryDropdownOpen && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-xl border border-black/8 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 max-h-48 overflow-y-auto no-scrollbar">
+                  {categories
+                    .filter((item) => item !== 'Semua')
+                    .map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => {
+                          setCategory(item)
+                          setIsCategoryDropdownOpen(false)
+                          if (errors.category) {
+                            setErrors((prev) => ({ ...prev, category: '' }))
+                          }
+                        }}
+                        className={`w-full flex items-center justify-between px-3.5 py-2 text-[13px] text-left transition-colors cursor-pointer ${
+                          category === item
+                            ? 'bg-[#0071E3]/10 text-[#0071E3] font-semibold'
+                            : 'text-[#1D1D1F] hover:bg-black/5'
+                        }`}
+                      >
+                        <span className="truncate">{item}</span>
+                        {category === item && <Check className="w-4 h-4 text-[#0071E3] shrink-0" />}
+                      </button>
+                    ))}
 
+                  {categories.filter((item) => item !== 'Semua').length < 5 && (
+                    <>
+                      <div className="h-px bg-black/6 my-1" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCategory('new')
+                          setIsCategoryDropdownOpen(false)
+                        }}
+                        className={`w-full flex items-center justify-between px-3.5 py-2 text-[13px] font-semibold text-[#0071E3] hover:bg-[#0071E3]/8 transition-colors cursor-pointer ${
+                          category === 'new' ? 'bg-[#0071E3]/10' : ''
+                        }`}
+                      >
+                        <span>+ Kategori Baru...</span>
+                        {category === 'new' && <Check className="w-4 h-4 text-[#0071E3] shrink-0" />}
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Input Kategori Baru (Muncul jika user memilih + Kategori Baru) */}
               {category === 'new' && (
                 <input
                   type="text"
                   value={customCategory}
+                  autoFocus
                   onChange={(e) => {
                     setCustomCategory(e.target.value)
                     setErrors((prev) => ({
@@ -392,8 +458,8 @@ export default function AddMenuModal({
                       submit: '',
                     }))
                   }}
-                  placeholder="Ketik kategori baru..."
-                  className="mt-1 w-full py-2 px-3 text-[14px] bg-white rounded-xl border border-black/12 focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 outline-none"
+                  placeholder="Ketik nama kategori baru..."
+                  className="mt-1 w-full py-2 px-3.5 text-[13px] bg-white rounded-xl border border-black/12 focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 outline-none transition-all"
                 />
               )}
 
@@ -464,7 +530,7 @@ export default function AddMenuModal({
           <div className="pt-3 flex items-center justify-end gap-2.5 border-t border-black/6">
             <Button
               type="button"
-              variant="destructive"
+              variant="secondary"
               size="md"
               onClick={onClose}
               disabled={isSaving}

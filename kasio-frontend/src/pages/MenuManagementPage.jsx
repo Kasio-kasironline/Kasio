@@ -4,11 +4,12 @@ import AddMenuModal from '../features/products/AddMenuModal'
 import EditMenuModal from '../features/products/EditMenuModal'
 import StoreSettingsModal from '../features/settings/StoreSettingsModal'
 import { formatIDR, getInitials } from '../utils/formatters'
+import { SquarePen, Settings, Plus, ChevronLeft } from 'lucide-react'
 
 /**
  * MenuManagementPage view: Dedicated screen for store owners to manage catalog.
- * Supports adding new menu items, editing existing items, deleting items,
- * toggling stock availability, live search / category filtering, and store settings (QRIS & max 5 categories).
+ * Supports adding new menu items, editing items (details, stock availability, and deletion inside modal),
+ * live search / category filtering, and store settings (QRIS & max 5 categories).
  * Follows Apple HIG layout principles.
  */
 export default function MenuManagementPage({
@@ -16,7 +17,6 @@ export default function MenuManagementPage({
   onAddMenu,
   onUpdateMenu,
   onDeleteMenu,
-  onToggleAvailability,
   onNavigateToPos,
   categories = ['Semua'],
   categoryList = [],
@@ -32,8 +32,6 @@ export default function MenuManagementPage({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [itemToEdit, setItemToEdit] = useState(null)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
-  const [itemToDelete, setItemToDelete] = useState(null)
-  const [isDeleting, setIsDeleting] = useState(false)
 
   // Filtered menu items
   const filteredItems = useMemo(() => {
@@ -50,20 +48,6 @@ export default function MenuManagementPage({
     })
   }, [menuItems, selectedCategory, searchQuery])
 
-  const confirmDelete = async () => {
-    if (!itemToDelete) return
-
-    setIsDeleting(true)
-    try {
-      await onDeleteMenu(itemToDelete.id)
-      setItemToDelete(null)
-    } catch (err) {
-      console.error('Gagal menghapus menu:', err)
-    } finally {
-      setIsDeleting(false)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-[#F5F5F7] text-[#1D1D1F] flex flex-col font-sans">
       {/* Top Navigation Bar */}
@@ -74,12 +58,12 @@ export default function MenuManagementPage({
             <button
               type="button"
               onClick={onNavigateToPos}
-              className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#0071E3] hover:bg-[#0071E3]/10 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+              title="Kembali ke Kasir"
+              aria-label="Kembali ke Kasir"
+              className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#0071E3] hover:bg-[#0071E3]/10 px-2.5 sm:px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-              <span>Kembali ke Kasir</span>
+              <ChevronLeft className="w-4 h-4"/>
+              <span className="hidden sm:inline">Kembali ke Kasir</span>
             </button>
 
             <span className="text-[#86868B] hidden sm:inline">|</span>
@@ -99,13 +83,12 @@ export default function MenuManagementPage({
             <button
               type="button"
               onClick={() => setIsSettingsModalOpen(true)}
-              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/8 active:scale-95 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
+              title="Pengaturan Tambahan (QRIS & Kategori)"
+              aria-label="Pengaturan Tambahan"
+              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/8 active:scale-95 px-2.5 sm:px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0"
             >
-              <svg className="w-4 h-4 text-[#86868B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-              <span>Pengaturan Tambahan</span>
+              <Settings className="w-4 h-4"/>
+              <span className="hidden sm:inline">Pengaturan Tambahan</span>
             </button>
           </div>
         </div>
@@ -138,7 +121,7 @@ export default function MenuManagementPage({
               Daftar Menu Produk
             </h1>
             <p className="text-[13px] text-[#86868B] mt-0.5">
-              Tambah, edit status ketersediaan, atau hapus menu dari katalog toko.
+              Tambah dan kelola katalog produk, harga, ketersediaan, atau foto menu.
             </p>
           </div>
 
@@ -148,10 +131,7 @@ export default function MenuManagementPage({
             onClick={() => setIsAddModalOpen(true)}
             className="self-start sm:self-auto inline-flex items-center gap-1.5 shadow-sm"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            <Plus className="w-4 h-4 shrink-0" />
             <span>Tambah Menu Baru</span>
           </Button>
         </div>
@@ -231,24 +211,22 @@ export default function MenuManagementPage({
                 className="bg-white rounded-2xl border border-black/6 p-4 flex flex-col justify-between hover:shadow-md transition-all text-left"
               >
                 <div>
-                  {/* Category and Stock Badge */}
+                  {/* Category and Non-clickable Stock Badge */}
                   <div className="flex items-center justify-between mb-2.5">
                     <span className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-black/4 text-[#86868B]">
                       {item.category}
                     </span>
 
-                    <button
-                      type="button"
-                      onClick={() => onToggleAvailability(item.id)}
-                      className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full transition-all cursor-pointer ${
+                    {/* Badge status ketersediaan (hanya tampilan informasi, tidak bisa diklik) */}
+                    <span
+                      className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full select-none ${
                         item.isAvailable
-                          ? 'bg-[#34C759]/10 text-[#34C759] hover:bg-[#34C759]/20'
-                          : 'bg-[#FF3B30]/10 text-[#FF3B30] hover:bg-[#FF3B30]/20'
+                          ? 'bg-[#34C759]/10 text-[#34C759]'
+                          : 'bg-[#FF3B30]/10 text-[#FF3B30]'
                       }`}
-                      title="Klik untuk ubah status ketersediaan"
                     >
                       {item.isAvailable ? '● Tersedia' : '○ Habis'}
-                    </button>
+                    </span>
                   </div>
 
                   {/* Thumbnail, Name, and Description */}
@@ -285,7 +263,7 @@ export default function MenuManagementPage({
                   </div>
                 </div>
 
-                {/* Price, Edit, and Delete Action Footer */}
+                {/* Price and Edit Action Footer */}
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-black/4">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-[#86868B] uppercase font-medium">
@@ -296,46 +274,16 @@ export default function MenuManagementPage({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setItemToEdit(item)}
-                      className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#1D1D1F] hover:bg-black/8 bg-black/5 px-2.5 py-1.5 rounded-xl transition-all active:scale-95 cursor-pointer"
-                      title="Edit rincian menu"
-                    >
-                      <svg
-                        className="w-3.5 h-3.5 text-[#86868B]"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M12 20h9" />
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                      </svg>
-                      <span>Edit</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setItemToDelete(item)}
-                      className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#FF3B30] hover:text-[#D70015] bg-[#FF3B30]/10 hover:bg-[#FF3B30]/20 px-2.5 py-1.5 rounded-xl transition-all active:scale-95 cursor-pointer"
-                      title="Hapus menu ini"
-                    >
-                      <svg
-                        className="w-3.5 h-3.5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M3 6h18" />
-                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                      </svg>
-                      <span>Hapus</span>
-                    </button>
-                  </div>
+                  {/* Tombol tunggal: Edit Menu */}
+                  <button
+                    type="button"
+                    onClick={() => setItemToEdit(item)}
+                    className="inline-flex items-center gap-1.5 text-[12px] sm:text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/10 active:bg-black/15 px-3 py-1.5 rounded-xl transition-all active:scale-95 cursor-pointer"
+                    title="Edit rincian, stok, atau hapus menu"
+                  >
+                    <SquarePen className="w-4 h-4"/>
+                    <span>Edit Menu</span>
+                  </button>
                 </div>
               </div>
             ))}
@@ -352,13 +300,14 @@ export default function MenuManagementPage({
         business={business}
       />
 
-      {/* Modal Edit Menu */}
+      {/* Modal Edit Menu (mengurus edit, ketersediaan, dan hapus) */}
       {itemToEdit && (
         <EditMenuModal
           isOpen={Boolean(itemToEdit)}
           onClose={() => setItemToEdit(null)}
           menuItem={itemToEdit}
           onUpdateMenu={onUpdateMenu}
+          onDeleteMenu={onDeleteMenu}
           categories={categories}
           business={business}
         />
@@ -375,60 +324,6 @@ export default function MenuManagementPage({
         onDeleteCategory={onDeleteCategory}
         onUpdateBusinessQris={onUpdateBusinessQris}
       />
-
-      {/* Confirmation Modal for Delete */}
-      {itemToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div
-            className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-black/8 text-center space-y-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="w-12 h-12 rounded-full bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center mx-auto">
-              <svg
-                className="w-6 h-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M3 6h18" />
-                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-              </svg>
-            </div>
-
-            <div>
-              <h3 className="text-[17px] font-bold text-[#1D1D1F]">
-                Hapus Menu?
-              </h3>
-              <p className="text-[13px] text-[#86868B] mt-1 leading-relaxed">
-                Apakah Anda yakin ingin menghapus menu{' '}
-                <strong className="text-[#1D1D1F]">{itemToDelete.name}</strong>?
-                Tindakan ini tidak dapat dibatalkan.
-              </p>
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setItemToDelete(null)}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-black/10 font-semibold text-[13px] text-[#1D1D1F] hover:bg-black/5 transition-all cursor-pointer"
-                disabled={isDeleting}
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={confirmDelete}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-[#FF3B30] hover:bg-[#D70015] font-semibold text-[13px] text-white transition-all shadow-sm shadow-[#FF3B30]/20 cursor-pointer disabled:opacity-60"
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Menghapus...' : 'Ya, Hapus'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
