@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { useAuth } from '../../hooks/useAuth'
+import {Phone, Mail, Eye, EyeOff} from 'lucide-react'
 
 /**
  * RegisterForm component for UMKM store owner onboarding.
@@ -25,21 +26,6 @@ export default function RegisterForm({ onRegisterSuccess }) {
   const [errors, setErrors] = useState({})
   const [registerSuccess, setRegisterSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
-
-  // Quick fill helper for testing UI
-  const handleFillDemo = () => {
-    setFormData({
-      ownerName: 'Budi Santoso',
-      businessName: 'Kopi & Snack Makmur',
-      phone: '081234567890',
-      email: 'budi@kopimakmur.id',
-      password: 'Kasio2026!',
-      confirmPassword: 'Kasio2026!',
-    })
-    setAgreeTerms(true)
-    setErrors({})
-    setRegisterSuccess(false)
-  }
 
   const handleChange = (e) => {
     const { id, value } = e.target
@@ -170,21 +156,6 @@ export default function RegisterForm({ onRegisterSuccess }) {
         </div>
       )}
 
-      {/* Demo Credentials Helper Pill */}
-      <div className="flex items-center justify-between p-2.5 bg-black/[0.03] border border-black/[0.06] rounded-xl text-[12px]">
-        <div className="flex items-center gap-1.5 text-[#86868B]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3]" />
-          <span>Isi Cepat Contoh Data Usaha</span>
-        </div>
-        <button
-          type="button"
-          onClick={handleFillDemo}
-          className="text-[#0071E3] font-medium hover:underline cursor-pointer"
-        >
-          Gunakan Contoh
-        </button>
-      </div>
-
       {/* Two Column Row: Owner Name & Business Name */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input
@@ -222,9 +193,7 @@ export default function RegisterForm({ onRegisterSuccess }) {
           error={errors.phone}
           required
           icon={
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-            </svg>
+            <Phone className="w-4 h-4"/>
           }
         />
 
@@ -238,10 +207,7 @@ export default function RegisterForm({ onRegisterSuccess }) {
           error={errors.email}
           required
           icon={
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect width="20" height="16" x="2" y="4" rx="2" />
-              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-            </svg>
+            <Mail className="w-4 h-4"/>
           }
         />
       </div>
@@ -265,17 +231,9 @@ export default function RegisterForm({ onRegisterSuccess }) {
               className="text-[#86868B] hover:text-[#1D1D1F] transition-colors p-1"
             >
               {showPassword ? (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-                  <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
-                  <line x1="2" x2="22" y1="2" y2="22" />
-                </svg>
+                <EyeOff className="w-4 h-4"/>
               ) : (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
+                <Eye className="w-4 h-4"/>
               )}
             </button>
           }

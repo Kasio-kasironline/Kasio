@@ -4,7 +4,7 @@ import AddMenuModal from '../features/products/AddMenuModal'
 import EditMenuModal from '../features/products/EditMenuModal'
 import StoreSettingsModal from '../features/settings/StoreSettingsModal'
 import { formatIDR, getInitials } from '../utils/formatters'
-import { SquarePen, Settings, Plus, ChevronLeft } from 'lucide-react'
+import { SquarePen, Settings, Plus, ChevronLeft, Search,BeefOff } from 'lucide-react'
 
 /**
  * MenuManagementPage view: Dedicated screen for store owners to manage catalog.
@@ -161,16 +161,7 @@ export default function MenuManagementPage({
 
           {/* Search Bar */}
           <div className="w-full md:w-80 relative">
-            <svg
-              className="w-4 h-4 text-[#86868B] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#86868B] pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
@@ -193,7 +184,7 @@ export default function MenuManagementPage({
         {/* Menu Items Table / Card Grid */}
         {isLoading ? null : filteredItems.length === 0 ? (
           <div className="p-12 text-center bg-white rounded-3xl border border-black/6 text-[#86868B]">
-            <span className="text-3xl">☕</span>
+            <BeefOff className="w-12 h-12 text-[#86868B] stroke-[1.5] mb-3 mx-auto" />
             <p className="font-semibold text-[#1D1D1F] text-[15px] mt-2">
               Tidak ada menu yang sesuai
             </p>

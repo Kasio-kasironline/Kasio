@@ -1,4 +1,5 @@
 import { formatIDR, getInitials } from '../../utils/formatters'
+import {Plus, Minus} from 'lucide-react'
 
 /**
  * MenuCard component representing a single menu item in the POS catalog.
@@ -94,10 +95,7 @@ export default function MenuCard({
               onClick={() => onAddToCart(item)}
               className="inline-flex items-center gap-1.5 text-[12px] sm:text-[13px] font-medium px-3 sm:px-3.5 py-1.5 rounded-xl bg-[#0071E3]/10 hover:bg-[#0071E3]/20 active:bg-[#0071E3]/30 text-[#0071E3] transition-all active:scale-[0.97] cursor-pointer whitespace-nowrap"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
+              <Plus className="w-3.5 h-3.5"/>
               <span>Tambah</span>
             </button>
           ) : (
@@ -108,9 +106,7 @@ export default function MenuCard({
                 aria-label={`Kurangi ${name}`}
                 className="w-6 h-6 rounded-lg bg-white/20 hover:bg-white/30 active:scale-95 flex items-center justify-center transition-all cursor-pointer"
               >
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+                <Minus className="w-3.5 h-3.5"/>
               </button>
 
               <span className="w-6 text-center text-[13px] font-bold select-none">
@@ -123,10 +119,7 @@ export default function MenuCard({
                 aria-label={`Tambah ${name}`}
                 className="w-6 h-6 rounded-lg bg-white/20 hover:bg-white/30 active:scale-95 flex items-center justify-center transition-all cursor-pointer"
               >
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+                <Plus className="w-3.5 h-3.5"/>
               </button>
             </div>
           )}
