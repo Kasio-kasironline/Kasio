@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { useAuth } from '../../hooks/useAuth'
+import {Mail, Lock, Eye, EyeOff} from 'lucide-react'
 
 /**
  * LoginForm component with Apple-inspired visuals and Supabase Auth integration.
@@ -17,14 +18,6 @@ export default function LoginForm({ onLoginSuccess }) {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const [authSuccess, setAuthSuccess] = useState(false)
-
-  // Quick fill helper for quick UI testing
-  const handleFillDemo = () => {
-    setEmail('pemilik@kopimakmur.id')
-    setPassword('Kasio2026!')
-    setErrors({})
-    setAuthSuccess(false)
-  }
 
   const validateForm = () => {
     const nextErrors = {}
@@ -110,21 +103,6 @@ export default function LoginForm({ onLoginSuccess }) {
         </div>
       )}
 
-      {/* Demo Credentials Helper Pill */}
-      <div className="flex items-center justify-between p-2.5 bg-black/[0.03] border border-black/[0.06] rounded-xl text-[12px]">
-        <div className="flex items-center gap-1.5 text-[#86868B]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3]" />
-          <span>Akun Demo Kasir UMKM</span>
-        </div>
-        <button
-          type="button"
-          onClick={handleFillDemo}
-          className="text-[#0071E3] font-medium hover:underline cursor-pointer"
-        >
-          Gunakan Demo
-        </button>
-      </div>
-
       {/* Email Input */}
       <Input
         label="Email Usaha / Kasir"
@@ -140,10 +118,7 @@ export default function LoginForm({ onLoginSuccess }) {
         autoComplete="email"
         required
         icon={
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect width="20" height="16" x="2" y="4" rx="2" />
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-          </svg>
+          <Mail className="w-4 h-4"/>
         }
       />
 
@@ -162,10 +137,7 @@ export default function LoginForm({ onLoginSuccess }) {
         autoComplete="current-password"
         required
         icon={
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-          </svg>
+          <Lock className="w-4 h-4"/>
         }
         rightElement={
           <button
@@ -175,17 +147,9 @@ export default function LoginForm({ onLoginSuccess }) {
             className="text-[#86868B] hover:text-[#1D1D1F] transition-colors p-1"
           >
             {showPassword ? (
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-                <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
-                <line x1="2" x2="22" y1="2" y2="22" />
-              </svg>
+              <EyeOff className="w-4 h-4"/>
             ) : (
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
+              <Eye className="w-4 h-4"/>
             )}
           </button>
         }

@@ -3,8 +3,8 @@ import { CATEGORIES, DUMMY_MENU_ITEMS } from '../data/dummyMenu'
 import MenuCard from '../features/pos/MenuCard'
 import CartPanel from '../features/pos/CartPanel'
 import PaymentModal from '../features/pos/PaymentModal'
-import { formatIDR } from '../utils/formatters'
-import { BarChart3, SlidersHorizontal, LogOut } from 'lucide-react'
+import { formatIDR } from '../utils/formatters' 
+import { BarChart3, LogOut, Menu, X, Search, Groceries, BeefOff} from 'lucide-react'
 
 /**
  * PosPage view: the core cashier Point-of-Sale screen.
@@ -173,16 +173,9 @@ export default function PosPage({
                 className="w-9 h-9 rounded-xl bg-black/5 hover:bg-black/8 active:scale-95 flex items-center justify-center text-[#1D1D1F] transition-all cursor-pointer"
               >
                 {isMobileMenuOpen ? (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
+                  <X className="w-4 h-4"/>
                 ) : (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                    <line x1="4" y1="7" x2="20" y2="7" />
-                    <line x1="4" y1="12" x2="20" y2="12" />
-                    <line x1="4" y1="17" x2="20" y2="17" />
-                  </svg>
+                  <Menu className="w-4 h-4"/>
                 )}
               </button>
             </div>
@@ -190,16 +183,7 @@ export default function PosPage({
 
           {/* Search Input Bar (Turun ke baris ke-2 di Mobile dengan lebar 100%, di tengah pada Desktop) */}
           <div className="w-full md:flex-1 md:max-w-md relative">
-            <svg
-              className="w-4 h-4 text-[#86868B] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#86868B] pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
@@ -213,7 +197,7 @@ export default function PosPage({
                 onClick={() => setSearchQuery('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#86868B] hover:text-[#1D1D1F] p-0.5 cursor-pointer"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -226,7 +210,7 @@ export default function PosPage({
                 onClick={onNavigateToAnalytics}
                 className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/8 active:scale-95 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
               >
-                <BarChart3 className="w-4 h-4 text-[#0071E3]" />
+                <BarChart3 className="w-4 h-4 " />
                 <span>Analitik</span>
               </button>
             )}
@@ -236,10 +220,7 @@ export default function PosPage({
                 onClick={onNavigateToMenuManagement}
                 className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1D1D1F] bg-black/5 hover:bg-black/8 active:scale-95 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
               >
-                <svg className="w-4 h-4 text-[#86868B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
+                <Groceries className="w-4 h-4" />
                 <span>Kelola Menu</span>
               </button>
             )}
@@ -250,11 +231,7 @@ export default function PosPage({
                 title="Keluar Akun"
                 className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#FF3B30] bg-[#FF3B30]/8 hover:bg-[#FF3B30]/15 active:scale-95 px-3 py-2 rounded-xl transition-all cursor-pointer"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
+                <LogOut className="w-4 h-4 " />
                 <span className="hidden sm:inline">Keluar</span>
               </button>
             )}
@@ -285,7 +262,7 @@ export default function PosPage({
                 }}
                 className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl text-[14px] font-semibold text-[#1D1D1F] hover:bg-black/5 active:bg-black/10 transition-colors text-left cursor-pointer"
               >
-                <BarChart3 className="w-4 h-4 text-[#0071E3]" />
+                <BarChart3 className="w-4 h-4" />
                 <span>Analitik & Laporan</span>
               </button>
             )}
@@ -299,7 +276,7 @@ export default function PosPage({
                 }}
                 className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl text-[14px] font-semibold text-[#1D1D1F] hover:bg-black/5 active:bg-black/10 transition-colors text-left cursor-pointer"
               >
-                <SlidersHorizontal className="w-4 h-4 text-[#86868B]" />
+                <Groceries className="w-4 h-4 text-[#86868B]" />
                 <span>Kelola Menu</span>
               </button>
             )}
@@ -351,8 +328,8 @@ export default function PosPage({
 
           {/* Catalog Grid */}
           {filteredItems.length === 0 ? (
-            <div className="py-20 text-center bg-white rounded-3xl border border-black/6">
-              <span className="text-4xl">☕</span>
+            <div className="py-16 px-4 text-center bg-white rounded-3xl border border-black/6">
+              <BeefOff className="w-12 h-12 text-[#86868B] stroke-[1.5] mb-3 mx-auto" />
               <p className="mt-3 text-[16px] font-semibold text-[#1D1D1F]">
                 Menu tidak ditemukan
               </p>

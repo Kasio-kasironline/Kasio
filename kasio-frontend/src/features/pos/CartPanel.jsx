@@ -1,5 +1,6 @@
 import { formatIDR } from '../../utils/formatters'
 import Button from '../../components/ui/Button'
+import {ScrollText, ShoppingBasket, Trash, MoveRight} from 'lucide-react'
 
 /**
  * CartPanel component displaying the active order docket.
@@ -28,11 +29,7 @@ export default function CartPanel({
       <div className="p-4 sm:p-5 border-b border-black/[0.06] flex items-center justify-between bg-white/70 backdrop-blur-md">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center font-bold text-sm">
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
+            <ScrollText className="w-4 h-4"/>
           </div>
           <div>
             <h2 className="text-[16px] font-semibold text-[#1D1D1F] leading-tight">
@@ -59,9 +56,7 @@ export default function CartPanel({
       <div className="flex-1 overflow-y-auto p-4 divide-y divide-black/[0.04]">
         {cart.length === 0 ? (
           <div className="h-full min-h-[260px] flex flex-col items-center justify-center text-center p-6 text-[#86868B]">
-            <div className="w-16 h-16 rounded-2xl bg-[#F5F5F7] flex items-center justify-center text-3xl mb-3 text-neutral-400">
-              🛒
-            </div>
+            <ShoppingBasket className="w-16 h-16"/>
             <p className="font-semibold text-[#1D1D1F] text-[15px]">
               Keranjang masih kosong
             </p>
@@ -98,10 +93,7 @@ export default function CartPanel({
                     aria-label={`Hapus ${item.name}`}
                     className="text-[#86868B] hover:text-[#FF3B30] p-1 text-[12px] transition-colors flex items-center gap-1 cursor-pointer"
                   >
-                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 6h18" />
-                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                    </svg>
+                    <Trash className="w-3.5 h-3.5"/>
                     <span>Hapus</span>
                   </button>
 
@@ -164,10 +156,7 @@ export default function CartPanel({
           className="w-full font-semibold shadow-sm justify-between px-5"
         >
           <span>Lanjut ke Pembayaran</span>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
+          <MoveRight className="w-4 h-4"/>
         </Button>
       </div>
     </div>
