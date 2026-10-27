@@ -1,5 +1,6 @@
+import { Minus, Plus } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { formatIDR, getInitials } from '../../utils/formatters'
-import {Plus, Minus} from 'lucide-react'
 
 /**
  * MenuCard component representing a single menu item in the POS catalog.
@@ -14,14 +15,24 @@ export default function MenuCard({
   onUpdateQuantity,
 }) {
   const { id, name, category, price, description, image, isAvailable } = item
+  const hasImage =
+    typeof image === 'string' &&
+    (image.startsWith('http') || image.startsWith('data:'))
+
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
+
+  useEffect(() => {
+    setImageLoaded(false)
+    setImageError(false)
+  }, [image])
 
   return (
     <div
-      className={`group relative flex flex-col justify-between bg-white rounded-2xl border p-3.5 sm:p-4 transition-all duration-200 overflow-hidden ${
-        isAvailable
-          ? 'border-black/[0.06] hover:border-black/[0.12] hover:shadow-md'
-          : 'border-black/[0.04] bg-neutral-50/60 opacity-60'
-      }`}
+      className={`group relative flex flex-col justify-between bg-white rounded-2xl border p-3.5 sm:p-4 transition-all duration-200 overflow-hidden ${isAvailable
+        ? 'border-black/[0.06] hover:border-black/[0.12] hover:shadow-md'
+        : 'border-black/[0.04] bg-neutral-50/60 opacity-60'
+        }`}
     >
       <div>
         {/* Top Header: Category Tag & Availability Badge */}
@@ -38,19 +49,41 @@ export default function MenuCard({
 
         {/* Thumbnail and Title Row */}
         <div className="flex items-start gap-3">
-          <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-[#F5F5F7] border border-black/8 flex items-center justify-center shrink-0 overflow-hidden select-none shadow-xs">
+
+          <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-[#F5F5F7] border border-black/8 flex items-center justify-center shrink-0 overflow-hidden select-none shadow-xs relative">
             {image && (image.startsWith('http') || image.startsWith('data:')) ? (
-              <img
-                src={image}
-                alt={name}
-                className="w-full h-full object-cover"
-              />
+              <>
+                {!imageLoaded && (
+                  <div className="absolute inset-0 animate-pulse bg-gray-200" />
+                )}
+
+                <img
+                  src={image}
+                  alt={name}
+                  loading="lazy"
+                  decoding="async"
+                  onLoad={() => setImageLoaded(true)}
+                  onError={() => {
+                    setImageError(true)
+                    setImageLoaded(false)
+                  }}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${imageLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                />
+
+                {imageError && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#0071E3]/10 to-[#0071E3]/20 flex items-center justify-center text-[#0071E3] font-extrabold text-base tracking-wider">
+                    {getInitials(name)}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-[#0071E3]/10 to-[#0071E3]/20 border border-[#0071E3]/15 flex items-center justify-center text-[#0071E3] font-extrabold text-base tracking-wider">
                 {getInitials(name)}
               </div>
             )}
           </div>
+
           <div className="flex-1 min-w-0">
             <h3
               className="font-semibold text-[14px] sm:text-[15px] text-[#1D1D1F] tracking-tight leading-snug line-clamp-2"
@@ -95,7 +128,7 @@ export default function MenuCard({
               onClick={() => onAddToCart(item)}
               className="inline-flex items-center gap-1.5 text-[12px] sm:text-[13px] font-medium px-3 sm:px-3.5 py-1.5 rounded-xl bg-[#0071E3]/10 hover:bg-[#0071E3]/20 active:bg-[#0071E3]/30 text-[#0071E3] transition-all active:scale-[0.97] cursor-pointer whitespace-nowrap"
             >
-              <Plus className="w-3.5 h-3.5"/>
+              <Plus className="w-3.5 h-3.5" />
               <span>Tambah</span>
             </button>
           ) : (
@@ -106,7 +139,7 @@ export default function MenuCard({
                 aria-label={`Kurangi ${name}`}
                 className="w-6 h-6 rounded-lg bg-white/20 hover:bg-white/30 active:scale-95 flex items-center justify-center transition-all cursor-pointer"
               >
-                <Minus className="w-3.5 h-3.5"/>
+                <Minus className="w-3.5 h-3.5" />
               </button>
 
               <span className="w-6 text-center text-[13px] font-bold select-none">
@@ -119,7 +152,7 @@ export default function MenuCard({
                 aria-label={`Tambah ${name}`}
                 className="w-6 h-6 rounded-lg bg-white/20 hover:bg-white/30 active:scale-95 flex items-center justify-center transition-all cursor-pointer"
               >
-                <Plus className="w-3.5 h-3.5"/>
+                <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
           )}
