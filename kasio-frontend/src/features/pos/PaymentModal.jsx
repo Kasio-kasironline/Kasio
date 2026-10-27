@@ -1,3 +1,4 @@
+import { Banknote, QrCode } from 'lucide-react'
 import { useState } from 'react'
 import Button from '../../components/ui/Button'
 import { supabase } from '../../lib/supabase'
@@ -203,24 +204,27 @@ export default function PaymentModal({
             <div className="p-1 rounded-2xl bg-black/[0.05] grid grid-cols-2 gap-1 mb-5">
               <button
                 type="button"
-                onClick={() => setPaymentMethod('cash')}
-                className={`py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${paymentMethod === 'cash'
+                onClick={() => setPaymentMethod('qris')}
+                className={`inline-flex items-center justify-center gap-2 py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${paymentMethod === 'qris'
                   ? 'bg-white text-[#1D1D1F] shadow-sm'
                   : 'text-[#86868B] hover:text-[#1D1D1F]'
                   }`}
               >
-                💵 Tunai (Cash)
+                <Banknote className="w-4 h-4 shrink-0" />
+                <span>Tunai (Cash)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setPaymentMethod('qris')}
-                className={`py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${paymentMethod === 'qris'
+                className={`inline-flex items-center justify-center gap-2 py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${paymentMethod === 'qris'
                   ? 'bg-white text-[#1D1D1F] shadow-sm'
                   : 'text-[#86868B] hover:text-[#1D1D1F]'
                   }`}
               >
-                📱 QRIS Statis
+                <QrCode className="w-4 h-4 shrink-0" />
+                <span>QRIS Statis</span>
               </button>
+
             </div>
 
             {/* Payment Mode Body */}
