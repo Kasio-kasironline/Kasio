@@ -1,10 +1,10 @@
-import { useState, useMemo, useEffect, useRef} from 'react'
+import { BarChart3, BeefOff, Groceries, LogOut, Menu, Search, X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CATEGORIES, DUMMY_MENU_ITEMS } from '../data/dummyMenu'
-import MenuCard from '../features/pos/MenuCard'
 import CartPanel from '../features/pos/CartPanel'
+import MenuCard from '../features/pos/MenuCard'
 import PaymentModal from '../features/pos/PaymentModal'
-import { formatIDR } from '../utils/formatters' 
-import { BarChart3, LogOut, Menu, X, Search, Groceries, BeefOff} from 'lucide-react'
+import { formatIDR } from '../utils/formatters'
 
 /**
  * PosPage view: the core cashier Point-of-Sale screen.
@@ -16,6 +16,7 @@ import { BarChart3, LogOut, Menu, X, Search, Groceries, BeefOff} from 'lucide-re
 export default function PosPage({
   menuItems = DUMMY_MENU_ITEMS,
   categories = CATEGORIES,
+  menuLoading = false,
   business,
   onNavigateToMenuManagement,
   onNavigateToAnalytics,
@@ -145,7 +146,7 @@ export default function PosPage({
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/6 px-4 sm:px-6 py-2.5 md:py-3 transition-all">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-4 relative">
-          
+
           {/* Row 1 di Mobile: Brand & Hamburger Button */}
           <div className="flex items-center justify-between w-full md:w-auto">
             {/* Brand & Store Profile */}
@@ -173,9 +174,9 @@ export default function PosPage({
                 className="w-9 h-9 rounded-xl bg-black/5 hover:bg-black/8 active:scale-95 flex items-center justify-center text-[#1D1D1F] transition-all cursor-pointer"
               >
                 {isMobileMenuOpen ? (
-                  <X className="w-4 h-4"/>
+                  <X className="w-4 h-4" />
                 ) : (
-                  <Menu className="w-4 h-4"/>
+                  <Menu className="w-4 h-4" />
                 )}
               </button>
             </div>
@@ -314,11 +315,10 @@ export default function PosPage({
                   key={category}
                   type="button"
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-[13px] font-semibold transition-all shrink-0 cursor-pointer ${
-                    isActive
+                  className={`px-4 py-2 rounded-full text-[13px] font-semibold transition-all shrink-0 cursor-pointer ${isActive
                       ? 'bg-[#0071E3] text-white shadow-sm shadow-[#0071E3]/30 scale-[1.02]'
                       : 'bg-white text-[#1D1D1F] hover:bg-black/5 border border-black/6'
-                  }`}
+                    }`}
                 >
                   {category}
                 </button>
@@ -327,7 +327,44 @@ export default function PosPage({
           </div>
 
           {/* Catalog Grid */}
-          {filteredItems.length === 0 ? (
+
+          {/* Catalog Grid */}
+          {menuLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col justify-between bg-white rounded-2xl border border-black/[0.06] p-3.5 sm:p-4 animate-pulse"
+                >
+                  <div>
+                    {/* Skeleton kategori */}
+                    <div className="h-5 w-20 rounded-full bg-gray-200 mb-2.5" />
+
+                    {/* Skeleton thumbnail dan informasi menu */}
+                    <div className="flex items-start gap-3">
+                      <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gray-200 shrink-0" />
+
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div className="h-4 w-3/4 rounded bg-gray-200" />
+                        <div className="h-3 w-full rounded bg-gray-100" />
+                        <div className="h-3 w-2/3 rounded bg-gray-100" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Skeleton harga dan tombol */}
+                  <div className="flex items-center justify-between gap-2.5 mt-3.5 sm:mt-4 pt-3 border-t border-black/[0.04]">
+                    <div className="space-y-2">
+                      <div className="h-2.5 w-10 rounded bg-gray-100" />
+                      <div className="h-4 w-20 rounded bg-gray-200" />
+                    </div>
+
+                    <div className="h-8 w-20 rounded-xl bg-gray-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredItems.length === 0 ? (
             <div className="py-16 px-4 text-center bg-white rounded-3xl border border-black/6">
               <BeefOff className="w-12 h-12 text-[#86868B] stroke-[1.5] mb-3 mx-auto" />
               <p className="mt-3 text-[16px] font-semibold text-[#1D1D1F]">
@@ -341,6 +378,7 @@ export default function PosPage({
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
               {filteredItems.map((item) => {
                 const lineItem = cart.find((line) => line.item.id === item.id)
+
                 return (
                   <MenuCard
                     key={item.id}
@@ -386,7 +424,7 @@ export default function PosPage({
         </div>
       )}
 
-            {/* Mobile Cart Sheet / Modal Drawer (dengan dukungan swipe down) */}
+      {/* Mobile Cart Sheet / Modal Drawer (dengan dukungan swipe down) */}
       {isMobileCartOpen && (
         <div className="md:hidden fixed inset-0 z-40 flex flex-col justify-end">
           {/* Latar Belakang Redup */}

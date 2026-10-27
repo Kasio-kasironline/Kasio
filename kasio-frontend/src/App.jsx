@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { supabase } from './lib/supabase'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import PosPage from './pages/PosPage'
-import MenuManagementPage from './pages/MenuManagementPage'
-import AnalyticsPage from './pages/AnalyticsPage'
 import { AuthProvider } from './context/AuthProvider'
 import { useAuth } from './hooks/useAuth'
+import { supabase } from './lib/supabase'
+import AnalyticsPage from './pages/AnalyticsPage'
+import LoginPage from './pages/LoginPage'
+import MenuManagementPage from './pages/MenuManagementPage'
+import PosPage from './pages/PosPage'
+import RegisterPage from './pages/RegisterPage'
 
 function AppContent() {
   const { user, business, isLoading, logout, refreshBusiness } = useAuth()
@@ -285,7 +285,7 @@ function AppContent() {
     }
   }
 
-    // Update menu di Supabase
+  // Update menu di Supabase
   async function handleUpdateMenu(updatedItem) {
     if (!business?.id) {
       throw new Error('Data usaha belum tersedia.')
@@ -296,7 +296,7 @@ function AppContent() {
     try {
       const category = await getOrCreateCategory(updatedItem.category)
 
-            const { data, error } = await supabase
+      const { data, error } = await supabase
         .from('menu_items')
         .update({
           category_id: category.id,
@@ -320,15 +320,15 @@ function AppContent() {
         prev.map((item) =>
           item.id === updatedItem.id
             ? {
-                ...item,
-                name: data.name,
-                category: category.name,
-                categoryId: data.category_id,
-                price: Number(data.price),
-                description: data.description || '',
-                image: data.image_url || null,
-                isAvailable: data.is_available,
-              }
+              ...item,
+              name: data.name,
+              category: category.name,
+              categoryId: data.category_id,
+              price: Number(data.price),
+              description: data.description || '',
+              image: data.image_url || null,
+              isAvailable: data.is_available,
+            }
             : item
         )
       )
@@ -446,10 +446,11 @@ function AppContent() {
       <PosPage
         menuItems={menuItems}
         categories={categories}
+        menuLoading={menuLoading}
         business={business}
-        onNavigateToMenuManagement={() => setCurrentView('menu')}
-        onNavigateToAnalytics={() => setCurrentView('analytics')}
-        onLogout={logout}
+        onNavigateToMenuManagement={onNavigateToMenuManagement}
+        onNavigateToAnalytics={onNavigateToAnalytics}
+        onLogout={onLogout}
       />
     )
   }
