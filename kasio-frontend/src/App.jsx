@@ -448,9 +448,9 @@ function AppContent() {
         categories={categories}
         menuLoading={menuLoading}
         business={business}
-        onNavigateToMenuManagement={onNavigateToMenuManagement}
-        onNavigateToAnalytics={onNavigateToAnalytics}
-        onLogout={onLogout}
+        onNavigateToMenuManagement={() => setCurrentView('menu')}
+        onNavigateToAnalytics={() => setCurrentView('analytics')}
+        onLogout={logout}
       />
     )
   }
