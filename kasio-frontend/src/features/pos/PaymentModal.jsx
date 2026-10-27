@@ -205,7 +205,7 @@ export default function PaymentModal({
               <button
                 type="button"
                 onClick={() => setPaymentMethod('cash')}
-                className={`inline-flex items-center justify-center gap-2 py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${paymentMethod === 'cash'
+                className={`inline-flex items-center justify-center gap-2 py-2 text-[14px] font-semibold rounded-xl transition-all cursor-pointer ${paymentMethod === 'ash'
                   ? 'bg-white text-[#1D1D1F] shadow-sm'
                   : 'text-[#86868B] hover:text-[#1D1D1F]'
                   }`}
